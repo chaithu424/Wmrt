@@ -1,5 +1,5 @@
 ************************************************************************
-** Object ID     : I01289                                               *
+** Object ID     :                                              *
 ** Title         : Data staging for Concur                              *
 ** Author        : Hari Chaitanya                                       *
 ** Country       : Global                                               *
@@ -57,3 +57,3173 @@ END-OF-SELECTION.
   go_hrdata->update_db( iv_bpath = p_logbk ).
 
   go_hrdata->display_output( ).
+  **************************************************************************
+  ****************************************************
+  
+  class ZFAPCL_HR_MASTER_DATA_CONCUR definition
+  public
+  final
+  create private .
+
+public section.
+
+  interfaces ZFAPIF_HR_MASTER_DATA_CONCUR .
+
+  aliases AUTH_CHECK
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~AUTH_CHECK .
+  aliases BACKUP_INPUT_FILE
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~BACKUP_INPUT_FILE .
+  aliases CHECK_PARALLEL_FIELDS
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~CHECK_PARALLEL_FIELDS .
+  aliases COLLECT_RESULTS
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~COLLECT_RESULTS .
+  aliases DISPLAY_OUTPUT
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~DISPLAY_OUTPUT .
+  aliases FILL_CONCURCN_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~FILL_CONCURCN_DATA .
+  aliases GET_ACCOUNTING_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~GET_ACCOUNTING_DATA .
+  aliases GET_EMP_RECORDS
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~GET_EMP_RECORDS .
+  aliases GET_INPUT_FILE_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~GET_INPUT_FILE_DATA .
+  aliases GET_LDAP_UPN_EMAIL
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~GET_LDAP_UPN_EMAIL .
+  aliases INITIATE_PARALLEL_PROCESSING
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~INITIATE_PARALLEL_PROCESSING .
+  aliases PARALLEL_PROCESSING
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~PARALLEL_PROCESSING .
+  aliases PREP_DATA_FOR_UPDATE
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~PREP_DATA_FOR_UPDATE .
+  aliases PROCESS_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~PROCESS_DATA .
+  aliases READ_ADHOC_USERS
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~READ_ADHOC_USERS .
+  aliases READ_ERROR_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~READ_ERROR_DATA .
+  aliases READ_HR_FILE_DATA
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~READ_HR_FILE_DATA .
+  aliases READ_INPUT_FILE
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~READ_INPUT_FILE .
+  aliases UPDATE_DB
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~UPDATE_DB .
+  aliases VALIDATE_INPUT_FILE
+    for ZFAPIF_HR_MASTER_DATA_CONCUR~VALIDATE_INPUT_FILE .
+
+  types:
+    BEGIN OF ty_comp_code,
+        lifnr TYPE lifnr,
+        bukrs TYPE bukrs,
+      END OF ty_comp_code .
+  types:
+    tty_comp_code TYPE TABLE OF ty_comp_code .
+  types:
+    BEGIN OF ty_appr_data,
+        payband    TYPE trfgr,
+        appr_limit TYPE ptrv_trip_total,
+      END OF ty_appr_data .
+  types:
+    BEGIN OF ty_emp_data,
+        emp_id  TYPE char30,
+        payband TYPE trfgr,
+      END OF ty_emp_data .
+  types:
+    BEGIN OF ty_lifnr,
+        intca TYPE intca,
+        lifnr TYPE lifnr,
+        winno TYPE stcd2,
+        stcd2 TYPE stcd2,
+      END OF ty_lifnr .
+  types:
+    tty_lifnr TYPE TABLE OF ty_lifnr .
+  types:
+    tty_appr_data TYPE TABLE OF ty_appr_data .
+  types TY_305 type ZCTIN_305 .
+  types:
+    tty_305 TYPE STANDARD TABLE OF ty_305 .
+  types:
+    tty_emp_data TYPE TABLE OF ty_emp_data .
+  types TY_HRDATA type ZCTES_HRDWDATA .
+  types:
+    tty_hrdata TYPE STANDARD TABLE OF ty_hrdata .
+  types:
+    tty_filelist TYPE STANDARD TABLE OF eps2fili .
+  types:
+    BEGIN OF ty_inputdata,
+        ind        TYPE char1,
+        win        TYPE sysid,
+        fieldname  TYPE char30,
+        fieldvalue TYPE string,
+      END OF ty_inputdata .
+  types:
+    tty_inputdata TYPE STANDARD TABLE OF ty_inputdata .
+  types:
+    BEGIN OF ty_apprv_data ,
+*        job_class  TYPE zd_jclass,
+        country    TYPE intca3,
+        paybnd     TYPE zd_paybnd,
+        job_level  TYPE zd_job_level,
+        trip_total TYPE ptrv_trip_total,
+      END OF ty_apprv_data .
+  types:
+    tty_apprv_data TYPE STANDARD TABLE OF ty_apprv_data .
+  types:
+    BEGIN OF ty_reimb_curr ,
+        waers TYPE waers,
+        intca TYPE intca,
+      END OF ty_reimb_curr .
+  types:
+    tty_reimb_curr TYPE STANDARD TABLE OF ty_reimb_curr .
+  types:
+    BEGIN OF ty_tvarvc ,
+        name TYPE  rvari_vnam,
+        low	 TYPE rvari_val_255,
+        high TYPE rvari_val_255,
+      END OF ty_tvarvc .
+  types:
+    tty_tvarvc TYPE STANDARD TABLE OF ty_tvarvc .
+  types:
+    BEGIN OF ty_appr_lm ,
+        jclass         TYPE zd_job_id,
+        job_level	     TYPE zd_job_level,
+        approval_limit TYPE zd_app_limit,
+      END OF ty_appr_lm .
+  types:
+    tty_appr_lm TYPE STANDARD TABLE OF ty_appr_lm .
+  types:
+    BEGIN OF ty_param_map ,
+        land1 TYPE  land1,
+        param	TYPE zde_param,
+        value	TYPE zde_value,
+      END OF ty_param_map .
+  types:
+    tty_param_map TYPE STANDARD TABLE OF ty_param_map .
+  types:
+    BEGIN OF ty_site_store ,
+        werks TYPE zd_site,
+        store TYPE zd_store,
+      END OF ty_site_store .
+  types:
+    tty_site_store TYPE STANDARD TABLE OF ty_site_store .
+  types:
+    BEGIN OF ty_fiorg_map ,
+        cntry TYPE zd_cntry,
+        divsn TYPE zd_divsn,
+        store TYPE zd_store,
+        kostl TYPE kostl,
+        bukrs TYPE bukrs,
+      END OF ty_fiorg_map .
+  types:
+    tty_fiorg_map TYPE STANDARD TABLE OF ty_fiorg_map .
+  types:
+    BEGIN OF ty_locale,
+        land1	 TYPE land1,
+        regio	 TYPE regio,
+        locale TYPE	zde_arb_locale,
+      END OF ty_locale .
+  types:
+    tty_locale TYPE STANDARD TABLE OF ty_locale .
+  types:
+    BEGIN OF ty_usrdtl,
+        usrid    TYPE sysid,
+        email_id TYPE ad_smtpadr,
+      END OF ty_usrdtl .
+  types:
+    BEGIN OF ty_user_trans,
+        BEGIN OF old_assoc,
+          assoc     TYPE char20,
+          email     TYPE ad_smtpadr,
+          winno(12) TYPE c,
+          fname     TYPE vorna,
+          lname     TYPE nachn,
+        END OF old_assoc,
+        BEGIN OF new_assoc,
+          assoc     TYPE char20,
+          email     TYPE ad_smtpadr,
+          winno(12) TYPE c,    " +PDS for Defect # 16547
+          fname     TYPE vorna,
+          lname     TYPE nachn,
+        END OF new_assoc,
+      END OF ty_user_trans .
+  types:
+    BEGIN OF ty_user_add,
+        associd   TYPE char20,
+        email     TYPE char255,
+        winno(10) TYPE c,
+        fname     TYPE vorna,
+        lname     TYPE nachn,
+      END OF ty_user_add .
+  types:
+    BEGIN OF ty_grc_req,
+        req_for   TYPE char1,
+        add       TYPE ty_user_add,
+        trans     TYPE ty_user_trans,
+        deac      TYPE ty_user_add,
+        store_ind TYPE flag,
+        role_ind  TYPE flag,
+        punit     TYPE zd_punit, "SMO_BUNIT, "ANAVANE " need to be changed
+      END OF ty_grc_req .
+  types:
+    BEGIN OF ty_err_msg,
+        msgid   TYPE syst-msgid,
+        msgno   TYPE syst-msgno,
+        msgty   TYPE syst-msgty,
+        p1      TYPE syst-msgv1,
+        p2      TYPE syst-msgv2,
+        p3      TYPE syst-msgv3,
+        p4      TYPE syst-msgv4,
+        message TYPE string,
+      END OF ty_err_msg .
+  types:
+    BEGIN OF ty_pgrp,
+        store   TYPE zd_store,
+        pur_grp	TYPE ekgrp,
+        punit   TYPE zde_punit,
+      END OF ty_pgrp .
+  types:
+    tty_pgrp TYPE STANDARD TABLE OF ty_pgrp .
+  types:
+    BEGIN OF ty_users,
+        usrid     TYPE xubname,
+        arb_usrid TYPE zde_arb_userid,
+        indicator TYPE char1,
+      END OF ty_users .
+  types:
+    tty_users TYPE STANDARD TABLE OF ty_users .
+  types:
+    tty_tvarvc_intca TYPE RANGE OF land1 .
+  types:
+    tty_exc_apprlmt TYPE STANDARD TABLE OF zput_exc_apprlmt .
+  types:
+    tty_t_cc_data TYPE STANDARD TABLE OF zapt_con_cc_hrdw .
+  types:
+    BEGIN OF tty_file_input,
+        del_item_flag    TYPE    zapt_con_cc_hrdw-del_item_flag,
+        level01          TYPE    zapt_con_cc_hrdw-level01,
+        level02          TYPE    zapt_con_cc_hrdw-level02,
+        level03          TYPE    zapt_con_cc_hrdw-level03,
+        level04          TYPE    zapt_con_cc_hrdw-level04,
+        level05          TYPE    zapt_con_cc_hrdw-level05,
+        level06          TYPE    zapt_con_cc_hrdw-level06,
+        level07          TYPE    zapt_con_cc_hrdw-level07,
+        level08          TYPE    zapt_con_cc_hrdw-level08,
+        level09          TYPE    zapt_con_cc_hrdw-level09,
+        level10          TYPE    zapt_con_cc_hrdw-level10,
+        kostl            TYPE    zapt_con_cc_hrdw-kostl,
+        tech_org_emailid TYPE    zapt_con_cc_hrdw-tech_org_emailid,
+        cc_owner         TYPE    zapt_con_cc_hrdw-cc_owner,
+      END OF tty_file_input .
+
+  constants:
+    BEGIN OF gc_request,
+        add        TYPE char1 VALUE 'A',
+        transfer   TYPE char1 VALUE 'T',
+        deactivate TYPE char1 VALUE 'D',
+      END OF gc_request .
+  constants:
+    gc_dot_s(2) TYPE c value '.S' ##NO_TEXT.
+  constants:
+    gc_sign(1)   TYPE c value 'I' ##NO_TEXT.
+  constants:
+    gc_option(2) TYPE c value 'EQ' ##NO_TEXT.
+  data GT_FIORG_MAP type TTY_FIORG_MAP .
+  data GT_LIFNR type TTY_LIFNR .
+  data GC_DR3 type CHAR3 value 'DR3' ##NO_TEXT.
+  data GC_QR3 type CHAR3 value 'QR3' ##NO_TEXT.
+  constants GC_CNTRY_CN type CHAR2 value 'CN' ##NO_TEXT.
+  constants GC_CNTRY_IN type CHAR2 value 'IN' ##NO_TEXT.
+  constants GC_CNTRY_GTS type CHAR2 value 'GK' ##NO_TEXT.
+  data GT_TVARVC_INTCA type TTY_TVARVC_INTCA .
+  constants GC_CLNT type CHAR4 value 'CLNT' ##NO_TEXT.
+  constants GC_CAACCNT_TVARVC_GJ type RVARI_VNAM value 'Z_I01289_CTE_GJCA_ACCOUNT' ##NO_TEXT.
+  constants GC_GJCOMPCODE_TVARVC type RVARI_VNAM value 'Z_I01289_CTEGJ_COMPCODE' ##NO_TEXT.
+  constants GC_D type CHAR1 value 'D' ##NO_TEXT.
+  constants GC_I type CHAR1 value 'I' ##NO_TEXT.
+  constants GC_Y type CHAR1 value 'Y' ##NO_TEXT.
+  data GT_TVARVC_TAB type TVARVC_T .
+  constants GC_GS_0067 type ZD_HRSRC value '67' ##NO_TEXT.
+  constants GC_GS_0070 type ZD_HRSRC value '70' ##NO_TEXT.
+  constants GC_N type C value 'N' ##NO_TEXT.
+  constants GC_CL_INTCA type INTCA value 'CL' ##NO_TEXT.
+  constants GC_K2_INTCA type INTCA value 'K2' ##NO_TEXT.
+  constants GC_UK_INTCA type INTCA value 'UK' ##NO_TEXT.
+  constants GC_GB_INTCA type INTCA value 'GB' ##NO_TEXT.
+  constants GC_HK_INTCA type INTCA value 'HK' ##NO_TEXT.
+  constants GC_IN type CHAR2 value 'IN' ##NO_TEXT.
+  constants GC_GTS type CHAR3 value 'GTS' ##NO_TEXT.
+  constants GC_AZURE_HRDW type CHAR5 value 'AHRDW' ##NO_TEXT.
+  constants GC_EMP_DETAIL type CHAR10 value 'EMP_DETAIL' ##NO_TEXT.
+  constants GC_305 type CHAR3 value '305' ##NO_TEXT.
+  constants GC_CON_FLD type CHAR8 value 'CUSTOM21' ##NO_TEXT.
+*
+  data GV_INP_FN type STRING  ##NEEDED.
+  data GV_SOURCE type CHAR1  ##NEEDED.
+  data GV_SUCCESS_PATH type STRING  ##NEEDED.
+  data GV_ERROR_PATH type STRING  ##NEEDED.
+  data GV_FILE type STRING  ##NEEDED.
+  data GV_ERROR_UPDATE type CHAR1  ##NEEDED.
+  data GV_SEND_JOBS type I  ##NEEDED.
+  data GV_RCV_JOBS type I  ##NEEDED.
+  data GV_EXCEPTION type CHAR1  ##NEEDED.
+  data GO_PARALLEL_PROCESSING type ref to ZCL_AR_AMS_PARALLEL_PROCESSING  ##NEEDED.
+  data GT_HRDATA type ZTT_CTE_HRDWDATA  ##NEEDED.
+  data GT_ADH_USER type ZTT_CTE_ADH_USR  ##NEEDED.
+  data GT_ERRORS_DB type ZTT_CTE_HRDW_ERROR  ##NEEDED.
+  data GT_305 type ZTT_CTIN_305  ##NEEDED.
+  data GT_VNDR type ZTT_VENDOR .
+  data GT_ERRORS type ZTT_CTE_HRDW_ERROR .
+  data GO_HRDATA type ref to ZCL_CTE_HR_MASTER_DATA .
+  data GT_320 type ZTT_CTIN_305 .
+  data:
+    gt_user_upd  TYPE STANDARD TABLE OF zfapt_cte_users .
+  data:
+    gt_hrdw_data TYPE STANDARD TABLE OF zput_hrdw_data_f .
+  data GO_UTILITY type ref to ZCL_AP_CTE_UTILITY .
+  data:
+    gt_error_upd TYPE STANDARD TABLE OF zfapt_hrdw_error .
+  data:
+    gt_error_del TYPE TABLE OF zfapt_hrdw_error .
+  constants GC_PIPE type CHAR1 value '|' ##NO_TEXT.
+  data GT_CC_DATA type TTY_T_CC_DATA .
+  constants GC_APT_CON_CC_TAB type TABNAME value 'ZAPT_CON_CC_HRDW' ##NO_TEXT.
+  data GV_P_LOGFL type PATH-PATHINTERN .
+  data GV_P_LOGBK type PATH-PATHINTERN .
+
+  class-methods GET_INSTANCE
+    importing
+      !IM_REPORT type PROGNAME optional
+    returning
+      value(RO_INSTANCE) type ref to ZFAPCL_HR_MASTER_DATA_CONCUR .
+  methods EXECUTE_COST_CENTER .
+  PROTECTED SECTION.
+private section.
+
+*  types:
+*    BEGIN OF ty_error_data,
+*      mandt           TYPE mandt,
+*      usrid           TYPE pernr_d,
+*      status         TYPE zstatus,
+*      username       TYPE uname,
+*      firstname       TYPE pad_vorna,
+*      lastname       TYPE pad_nachn,
+*      mi             TYPE pad_midnm,
+*      gender         TYPE gesch,
+*      email           TYPE ad_smtpadr,
+*      manager         TYPE psg_idnum,
+*      hr             TYPE psg_idnum,
+*      department     TYPE ad_dprtmnt,
+*      jobcode         TYPE zjobcode,
+*      division       TYPE spart,
+*      location       TYPE pbtxt,
+*      time_zone       TYPE tznzone,
+*      hiredate       TYPE begda,
+*      empid           TYPE usrid,
+*      title           TYPE titel,
+*      country         TYPE land1,
+*      default_locale TYPE zd_language,
+*      cus02           TYPE zde_formname,
+*      jobfamily       TYPE stext,
+*      jobclass       TYPE stext,
+*      payband         TYPE trfgr,
+*      cus13           TYPE zderoleid,
+*      zdomain         TYPE char20,
+*      cost_center     TYPE kostl,
+*      company_code   TYPE bukrs,
+*      waers           TYPE pad_waers,
+*      zlsch           TYPE pcode,
+*      emftx           TYPE emftx,
+*      banks           TYPE banks,
+*      bankl           TYPE bankk,
+*      bankk           TYPE bankn,
+*      birthname       TYPE pad_name2,
+*      nickname       TYPE pad_rufnm,
+*      vendor         TYPE lifnr,
+*      error_msg       TYPE zd_err_mesg,
+*    END OF ty_error_data .
+*  types:
+*    tty_error_data TYPE TABLE OF ty_error_data .
+  constants GC_A type CHAR1 value 'A' ##NO_TEXT.
+  constants GC_CONCUR type CHAR20 value 'CONCUR' ##NO_TEXT.
+  constants GC_COMMA type CHAR01 value ',' ##NO_TEXT.
+  data GV_FILE_PATH type STRING .
+  data GT_FILELIST type TTY_FILELIST .
+  class-data GT_EXC_APPRLMT type TTY_EXC_APPRLMT .
+  data GT_APPR_DATA type TTY_APPRV_DATA .
+  class-data GT_305_DATA type TTY_EMP_DATA .
+  constants GC_ERROR_STATUS type STRING value 'ERROR' ##NO_TEXT.
+  data GT_ROLES type TVARVC_T .
+  constants GC_OPER_IND_R type CHAR1 value 'R' ##NO_TEXT.
+  constants GC_OPER_IND_I type CHAR1 value 'I' ##NO_TEXT.
+  constants GC_OPER_IND_D type CHAR1 value 'D' ##NO_TEXT.
+  constants GC_OPER_IND_C type CHAR1 value 'C' ##NO_TEXT.
+  constants GC_PAYTYPE_S type CHAR1 value 'S' ##NO_TEXT.
+  constants GC_TVARVC_INTCA type RVARI_VNAM value 'Z_I01289_CTE_INTCA' ##NO_TEXT.
+  data GT_PARAM_MAP type TTY_PARAM_MAP .
+  constants GC_LDAP_CONNECTOR type ZDE_PARAM value 'LDAP_CONNECTOR_HOMEOFFICE_GC' ##NO_TEXT.
+  data GT_APPR_LIM type TTY_APPR_LM .
+  constants GC_LDAP_CONNECTOR_ST type ZDE_PARAM value 'LDAP_CONNECTOR_STORE' ##NO_TEXT.
+  data GT_INPUTDATA type TTY_INPUTDATA .
+  data GT_REIMB_CURR type TTY_REIMB_CURR .
+  data GT_COMP_CODE type TTY_COMP_CODE .
+  data GC_TRG type CHAR4 value '.trg' ##NO_TEXT.
+  data GC_TXT type CHAR4 value '.txt' ##NO_TEXT.
+  data GC_BKP type CHAR4 value '.bkp' ##NO_TEXT.
+  data GC_DOT type CHAR1 value '.' ##NO_TEXT.
+  data GC_Z004 type CHAR4 value 'Z004' ##NO_TEXT.
+  data GC_CSV type CHAR4 value '.csv' ##NO_TEXT.
+  constants GC_SLASH type CHAR1 value '/' ##NO_TEXT.
+  constants GC_M type CHAR1 value 'M' ##NO_TEXT.
+  constants GC_CC_SUFFIX_NAME type TVARV-NAME value 'Z_01289_CTEIN_COMPCODE' ##NO_TEXT.
+ENDCLASS.
+
+
+
+CLASS ZFAPCL_HR_MASTER_DATA_CONCUR IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->EXECUTE_COST_CENTER
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD execute_cost_center.
+************************************************************************
+*  Method Name     :   EXECUTE                                         *
+*  Object ID       :   I01289                                          *
+*  Title           :   Execute process for Cost center owner & tech    *
+*                      org file to store in staging table              *
+*  Author          :   Venkatesh Pelli                                 *
+*  Country         :   IN                                              *
+*  Creation Date   :   12-Sep-2022                                     *
+*  Description     :   processs 710 Concur Cost center                 *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request      Description                     *
+* VN532TM     09/12/2022  DR3K938940  Initial                          *
+*----------------------------------------------------------------------*
+
+    " Process File
+    CALL METHOD me->zfapif_hr_master_data_concur~read_cc_file_data
+      EXPORTING
+        iv_ipath  = gv_p_logfl
+      IMPORTING
+        et_ccdata = gt_cc_data.
+
+    IF gt_cc_data IS NOT INITIAL.
+      " Update file data in to CC HRDW Custom database table and Archieve File
+      CALL METHOD me->zfapif_hr_master_data_concur~update_cc_db
+        EXPORTING
+          iv_bpath = gv_p_logbk.
+
+    ENDIF.
+
+    " Display logs output
+    CALL METHOD me->zfapif_hr_master_data_concur~display_output.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZFAPCL_HR_MASTER_DATA_CONCUR=>GET_INSTANCE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IM_REPORT                      TYPE        PROGNAME(optional)
+* | [<-()] RO_INSTANCE                    TYPE REF TO ZFAPCL_HR_MASTER_DATA_CONCUR
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_instance.
+
+************************************************************************
+*  Method Name     :   GET_INSTANCE                                    *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Factory method to initialize and return instance*
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+    DATA: ls_trdir_row TYPE trdir.
+*   Authorization Check
+    IF im_report IS SUPPLIED.
+      CALL FUNCTION 'RS_TRDIR_SELECT'
+        EXPORTING
+          trdir_name = im_report
+        IMPORTING
+          trdir_row  = ls_trdir_row.
+** Check authorization of the report
+      AUTHORITY-CHECK OBJECT 'S_PROGRAM'
+               ID 'P_GROUP'  FIELD ls_trdir_row-secu
+               ID 'P_ACTION' FIELD zif_ap_cte_constants=>gc_action_sub.
+      IF sy-subrc <> 0.
+        MESSAGE ID zif_ap_cte_constants=>gc_msg_class_cte TYPE 'E' NUMBER '028'.
+        LEAVE LIST-PROCESSING.
+      ENDIF.
+
+** Check authorization of the Table Update
+      AUTHORITY-CHECK OBJECT 'S_TABU_DIS'
+             ID 'ACTVT'     FIELD '02'
+             ID 'DICBERCLS' FIELD '/CON'.
+      IF sy-subrc <> 0.
+        MESSAGE ID zif_ap_cte_constants=>gc_msg_class_cte TYPE 'E' NUMBER '028'.
+        LEAVE LIST-PROCESSING.
+      ENDIF.
+    ENDIF.
+* Instantiation
+    ro_instance = NEW #( ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~AUTH_CHECK
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IM_REPORT                      TYPE        PROGNAME(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~auth_check.
+************************************************************************
+*  Method Name     :   AUTH_CHECK                                      *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Authorization Check                             *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+    DATA: ls_trdir_row TYPE trdir.
+
+    CALL FUNCTION 'RS_TRDIR_SELECT'
+      EXPORTING
+        trdir_name = im_report
+      IMPORTING
+        trdir_row  = ls_trdir_row.
+** Check authorization of the report
+    AUTHORITY-CHECK OBJECT 'S_PROGRAM'
+             ID 'P_GROUP'  FIELD ls_trdir_row-secu
+             ID 'P_ACTION' FIELD zif_ap_cte_constants=>gc_action_sub.
+    IF sy-subrc <> 0.
+      MESSAGE ID zif_ap_cte_constants=>gc_msg_class_cte TYPE 'E' NUMBER '028'.
+      LEAVE LIST-PROCESSING.
+    ENDIF.
+
+** Check authorization of the Table Update
+    AUTHORITY-CHECK OBJECT 'S_TABU_DIS'
+           ID 'ACTVT'     FIELD '02'
+           ID 'DICBERCLS' FIELD '/CON'.
+    IF sy-subrc <> 0.
+      MESSAGE ID zif_ap_cte_constants=>gc_msg_class_cte TYPE 'E' NUMBER '028'.
+      LEAVE LIST-PROCESSING.
+    ENDIF.
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~BACKUP_INPUT_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_BPATH                       TYPE        FILEINTERN
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~backup_input_file.
+************************************************************************
+*  Method Name     :   BACKUP_INPUT_FILE                               *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Move the processed file to backup folder        *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request       Description                    *
+
+*----------------------------------------------------------------------*
+    DATA :  ls_filelist TYPE eps2fili,
+            lv_bpath    TYPE string,
+            lv_len      TYPE i,
+            lv_dummy    TYPE char3    VALUE 'any'.   "Dummy filename
+    DATA: lv_source_file_name TYPE  btcxpgpar,
+          lv_target_file_name TYPE  btcxpgpar,
+          lv_source_dir_name  TYPE  btcxpgpar,
+          lv_target_dir_name  TYPE  btcxpgpar,
+          lv_del_file_name    TYPE epsfilnam,
+          lv_del_dir_name     TYPE epsdirnam.
+
+    CALL FUNCTION 'FILE_GET_NAME_USING_PATH'
+      EXPORTING
+        client                     = sy-mandt
+        logical_path               = iv_bpath
+        operating_system           = sy-opsys
+        file_name                  = lv_dummy
+      IMPORTING
+        file_name_with_path        = lv_bpath
+      EXCEPTIONS
+        path_not_found             = 1
+        missing_parameter          = 2
+        operating_system_not_found = 3
+        file_system_not_found      = 4
+        OTHERS                     = 5.
+
+    IF sy-subrc EQ 0.
+*  Remove dummy file name from the physical path
+      lv_len = strlen( lv_bpath ).
+      lv_len = lv_len - 3.
+      lv_bpath = lv_bpath+0(lv_len).
+    ELSE.
+      CLEAR lv_bpath.
+    ENDIF.
+    TRY.
+* File list internal table will have one record only.
+        ls_filelist = gt_filelist[ 1 ].
+
+* Take backup of input file
+        lv_source_file_name = lv_target_file_name = ls_filelist-name. " File Name
+        lv_source_dir_name  = gv_file_path.                           " Source Directory
+        lv_target_dir_name  = lv_bpath.                               " Target Directory
+
+        CALL FUNCTION 'Z_BACKUP_AHRDW_FILE' IN UPDATE TASK
+          EXPORTING
+            iv_source_file_name = lv_source_file_name
+            iv_target_file_name = lv_target_file_name
+            iv_source_dir_name  = lv_source_dir_name
+            iv_target_dir_name  = lv_target_dir_name.
+
+
+
+      CATCH cx_sy_itab_line_not_found.
+
+    ENDTRY.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~CHECK_PARALLEL_FIELDS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IM_SERVER                      TYPE        RZLLI_APCL
+* | [--->] IM_THRDS                       TYPE        NUMC3
+* | [--->] IM_REPT                        TYPE        INT1
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~check_parallel_fields.
+*  If server is initial, display error message.
+    IF im_server IS INITIAL.
+      MESSAGE e050(zmpu_arb).
+    ENDIF.
+
+* IF thread input is initial , display error message.
+    IF im_thrds IS INITIAL.
+      MESSAGE e051(zmpu_arb).
+    ENDIF.
+
+*-- If repeat input is initial , display error message.
+    IF im_rept IS INITIAL.
+      MESSAGE e052(zmpu_arb).
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~COLLECT_RESULTS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] P_TASK                         TYPE        CLIKE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~collect_results.
+************************************************************************
+*  Method Name     :   COLLECT_RESULTS                                 *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+    DATA : lo_parallel_processing TYPE REF TO zcl_ar_ams_parallel_processing.
+
+    DATA: lt_errors   TYPE ztt_cte_hrdw_error,
+          lt_usr_data TYPE ztt_cte_users,
+          lt_305      TYPE ztt_ctin_305,
+          lt_320      TYPE ztt_ctin_305.
+
+    CREATE OBJECT lo_parallel_processing.
+
+*-- Get the results from the new task
+    RECEIVE RESULTS FROM FUNCTION 'Z_HR_DETAILS_BUILD'
+    TABLES
+     et_305    = lt_305
+     et_320    = lt_320
+     et_errors = lt_errors
+    EXCEPTIONS
+      communication_failure = 1
+      system_failure        = 2
+      save_error_fail       = 3    "Exception for saving error data failed
+      OTHERS                = 4.
+
+
+    APPEND LINES OF lt_305 TO gt_305.
+    APPEND LINES OF lt_320 TO gt_320.
+    APPEND LINES OF lt_errors TO gt_errors.
+
+*-- Adding the receive jobs.
+    ADD 1 TO gv_rcv_jobs.
+
+    lo_parallel_processing->function_return_trigger( ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~DELETE_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_FILE_PATH                   TYPE        STRING
+* | [<---] EV_ERROR                       TYPE        CHAR1
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~delete_file.
+************************************************************************
+*  Method Name     :   READ_CC_FILE_DATA                               *
+*  Object ID       :   I01289                                          *
+*  Title           :   Execute process for Cost center owner & tech    *
+*                      org file to store in staging table              *
+*  Author          :   Venkatesh Pelli                                 *
+*  Country         :   IN                                              *
+*  Creation Date   :   12-Sep-2022                                     *
+*  Description     :   Delete Input file from server                   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request      Description                     *
+* VN532TM     09/12/2022  DR3K938940  Initial                          *
+*----------------------------------------------------------------------*
+
+    OPEN DATASET  iv_file_path  FOR INPUT IN BINARY MODE.
+    IF sy-subrc EQ 0.
+      DELETE DATASET  iv_file_path.
+      IF sy-subrc NE 0.
+        ev_error = abap_true.
+      ENDIF.
+      CLOSE DATASET   iv_file_path.
+      IF sy-subrc NE 0.
+        ev_error = abap_true.
+      ENDIF.
+    ELSE.
+      ev_error = abap_true.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~DISPLAY_OUTPUT
+* +-------------------------------------------------------------------------------------------------+
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~display_output.
+***********************************************************************
+*  Method Name     :   DISPLAY_OUTPUT                                  *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Update the Database tables in SAP               *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+** write output
+    IF gt_user_upd IS NOT INITIAL.
+      SORT gt_user_upd BY empid.
+      DELETE ADJACENT DUPLICATES FROM gt_user_upd COMPARING empid.
+      WRITE:/'Records Updated:'(001).
+      ULINE.
+
+      LOOP AT gt_user_upd INTO DATA(ls_user_upd).
+        WRITE:/ ls_user_upd-empid.
+        CLEAR ls_user_upd.
+      ENDLOOP.
+    ENDIF.
+
+    IF gt_error_del IS NOT INITIAL.
+      SORT gt_error_del BY awinno.
+      DELETE ADJACENT DUPLICATES FROM gt_error_del COMPARING awinno.
+      WRITE:/ 'Records processed from error:'(003).
+      ULINE.
+
+      LOOP AT gt_error_del INTO DATA(ls_error_del).
+        WRITE:/ ls_error_del-awinno.
+        CLEAR ls_error_del.
+      ENDLOOP.
+    ENDIF.
+
+    IF gt_errors IS NOT INITIAL.
+      SORT gt_errors BY awinno.
+      DELETE ADJACENT DUPLICATES FROM gt_errors COMPARING awinno.
+      WRITE:/ 'Records in error:'(006).
+      ULINE.
+
+      LOOP AT gt_errors INTO DATA(ls_error).
+        WRITE:/ ls_error-awinno.
+        CLEAR ls_error.
+      ENDLOOP.
+    ENDIF.
+
+** write Cost Center output
+    IF gt_cc_data IS NOT INITIAL.
+      WRITE:/'Records Updated:'(005).
+      ULINE.
+      LOOP AT gt_cc_data INTO DATA(ls_cc_data).
+        WRITE:/ ls_cc_data-kostl.
+        CLEAR ls_cc_data.
+      ENDLOOP.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~FILL_CONCURCN_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [--->] IV_STAGE_FLG                   TYPE        CHAR1(optional)
+* | [<---] ET_305                         TYPE        ZTT_CTIN_305
+* | [<---] ET_720                         TYPE        ZTT_CTE_720
+* | [<---] ET_750                         TYPE        ZTT_CTE_750
+* | [<---] ET_ERRORS                      TYPE        ZTT_CTE_HRDW_ERROR
+* | [<---] ET_VNDR                        TYPE        ZTT_VENDOR
+* | [<---] ET_SAILPNT                     TYPE        ZTT_CTE_SAILPNT
+* | [<---] ET_320                         TYPE        ZTT_CTIN_305
+* | [<---] ET_700                         TYPE        ZTT_CTE_700
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~fill_concurcn_data.
+************************************************************************
+*  Method Name     :   FILL_CONCURCN_DATA                              *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :   08/20/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+    DATA: ls_305      TYPE ty_305,
+          ls_320      TYPE ty_305,
+          lv_sloginid TYPE zde_arb_userid,
+          lv_intca_al TYPE char3,
+          lv_cntry    TYPE intca,
+          lv_ausrid   TYPE xubname,
+          lv_320_flg  TYPE char1,
+          lv_rndi     TYPE qfranint,
+          lt_hrdata   TYPE  ztt_hrdw_azure,
+          ltr_kostl   TYPE RANGE OF kostl.
+
+    CONSTANTS: lc_underscore TYPE char1 VALUE '_'.
+
+    lt_hrdata = it_hrdata[].   "In order to capture userid changes.
+
+    SORT lt_hrdata BY awinno opera.
+
+    " Begin of Temporary code to solve data issue in Fiorg missing charge store Ashmit
+    SELECT *
+      FROM tvarvc
+      INTO TABLE @DATA(lt_csks_tv)
+      WHERE name EQ 'Z_I01289_CSKS_STORE'.
+    IF sy-subrc EQ 0.
+      ltr_kostl = VALUE #( FOR ls_csks_tvtmp IN lt_csks_tv ( sign   = 'I'
+                                                             option = 'EQ'
+                                                             low    = ls_csks_tvtmp-high ) ).
+      SELECT kostl,
+             bukrs
+        FROM csks
+        INTO TABLE @DATA(lt_csks)
+        WHERE kostl IN @ltr_kostl.
+      IF sy-subrc NE 0.
+        CLEAR lt_csks.
+      ENDIF.
+    ENDIF.
+    " End of Temporary code to solve data issue in Fiorg missing charge store
+
+
+
+    LOOP AT lt_hrdata INTO DATA(ls_hrdwdata).
+
+      CLEAR: ls_305.
+
+      lv_cntry = lv_intca_al = ls_hrdwdata-intca.
+
+*  Fill 305 record mandatory fields
+      ls_305 = CORRESPONDING #( ls_hrdwdata ).
+      ls_305-login_id = ls_hrdwdata-auserid.
+
+* Create 320 record for login id update
+      IF ls_hrdwdata-opera = gc_oper_ind_d.
+*-----------------------------------------------------*
+* take off the delete records where the user id been changed.
+* Process with new insert data
+*-----------------------------------------------------*
+        CLEAR lv_320_flg.
+        READ TABLE lt_hrdata INTO DATA(ls_hrdwdata_c) WITH KEY awinno = ls_hrdwdata-awinno
+                                                               opera = gc_oper_ind_i BINARY SEARCH.
+        IF sy-subrc = 0.
+          ls_305              = CORRESPONDING #( ls_hrdwdata_c ).
+          ls_hrdwdata         = CORRESPONDING #( ls_hrdwdata_c ).
+          ls_hrdwdata-opera   = gc_oper_ind_d.
+          ls_305-login_id     = ls_hrdwdata_c-auserid.
+          lv_320_flg          = abap_true.
+        ENDIF.
+      ENDIF.
+      lv_ausrid    = ls_305-login_id.
+** The delete record might have the user id change details(where we carry insert and delete with same WIN)
+      IF ls_hrdwdata-opera = gc_oper_ind_d AND lv_320_flg = abap_false.
+        ls_305-active = gc_n.
+        APPEND ls_305 TO et_305.
+
+
+        CLEAR: ls_305, ls_hrdwdata.
+        CONTINUE.
+      ELSE.
+        ls_305-active = gc_y.
+      ENDIF.
+
+*--------------------------------------------------------------------*
+* fill country subcode filled with country code
+      IF ls_hrdwdata-intca IS NOT INITIAL.
+        ls_305-ctry_subcode = ls_hrdwdata-intca.
+      ENDIF.
+*  Hire Date
+      IF ls_hrdwdata-joindt IS NOT INITIAL.
+        ls_305-hdate = ls_hrdwdata-joindt.
+      ENDIF.
+*  Gender
+      IF ls_hrdwdata-gendr IS NOT INITIAL.
+        ls_305-gender = ls_hrdwdata-gendr.
+      ENDIF.
+*  HRBP
+      IF ls_hrdwdata-hrbp IS NOT INITIAL.
+        ls_305-custom1   = ls_hrdwdata-hrbp.
+      ENDIF.
+      IF ls_hrdwdata-is_hrbp IS NOT INITIAL.
+        ls_305-custom2   = ls_hrdwdata-is_hrbp.
+      ENDIF.
+*   Revise
+      IF ls_305-awinno IS NOT INITIAL.
+* call LDAP method to get the UPN and email.
+        DATA(lo_cte_hrdata) = NEW zcl_cte_hr_master_data( ).
+        lo_cte_hrdata->gt_tvarvc_intca = gt_tvarvc_intca.
+        IF lo_cte_hrdata IS BOUND.
+          lo_cte_hrdata->get_ldap_upn_email(
+          EXPORTING
+            iv_cntry     = lv_intca_al        " Country Key
+            iv_store_ind = ls_hrdwdata-saind  " Store Indicator
+            iv_ausrid    = lv_ausrid          " User Name in User Master Record
+            iv_winno     = ls_305-awinno
+            iv_lgort     = ls_hrdwdata-lgort  " Store Number
+          IMPORTING
+            ev_upn       = ls_305-login_id    " CONCUR user id
+            ev_email     = ls_305-email       " E-Mail Address
+            es_error     = DATA(ls_error) ).
+        ENDIF.
+
+        IF ls_error IS NOT INITIAL.
+*-- Push the records to the Error table in case of regular users
+
+          et_errors = VALUE #( BASE  et_errors ( VALUE #( BASE CORRESPONDING #( ls_hrdwdata
+                                                MAPPING ptype = paytyp
+                                                        hdate = joindt )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                         error_comment = |{ text-014 } { ls_error-message }| ) ) ).
+
+          CLEAR:   ls_hrdwdata.
+          CONTINUE.
+        ENDIF.
+
+      ELSE.
+        "Error if it is insert record.
+        IF ls_hrdwdata-opera EQ gc_oper_ind_i.
+          et_errors = VALUE #(  BASE et_errors ( VALUE #( BASE CORRESPONDING #( ls_hrdwdata
+                                          MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                   ernam    = sy-uname
+                                   ersda    = sy-datum
+                                   error_comment = 'WIN no is mandatory for deriving UPN.'(015) ) ) ).
+
+          CONTINUE.
+        ENDIF.
+      ENDIF.                   "User ID check
+* Revise
+* Checking the supervisor Active WIN and country in AD
+* This check only for XPAT's or users with multiple country WIN'S
+      IF ls_hrdwdata-swinno IS NOT INITIAL
+      AND ls_hrdwdata-intca IS NOT INITIAL.
+
+* call LDAP method to get the UPN and email for ACTIVE WIN & Country.
+        IF lo_cte_hrdata IS BOUND.
+          lo_cte_hrdata->get_ldap_upn_email(
+             EXPORTING
+               iv_cntry     = lv_intca_al         "  Country Key
+               iv_store_ind = ls_hrdwdata-saind   " Store Indicator
+               iv_ausrid    = lv_ausrid           " User Name in User Master Record
+               iv_winno     = ls_hrdwdata-swinno
+               iv_lgort     = ls_hrdwdata-lgort   " Store Number
+             IMPORTING
+               ev_upn       = lv_sloginid         " CONCUR user id
+               es_error     = ls_error ).
+        ENDIF.
+        IF ls_error IS NOT INITIAL.
+
+          et_errors = VALUE #(  BASE et_errors ( VALUE #( BASE CORRESPONDING #( ls_hrdwdata
+                                            MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                          ernam    = sy-uname
+                                         ersda     = sy-datum
+                                        error_comment = |{ text-013 } { ls_error-message }| ) ) ).
+          CLEAR: ls_hrdwdata.
+          CONTINUE.
+        ENDIF.
+
+      ENDIF.              " End XPAT supervisor or executive's Logic
+
+** Getting the HRDW Email information if HRDW has it and
+      IF ls_hrdwdata-email IS NOT INITIAL AND ls_305-email IS INITIAL.
+        ls_305-email = ls_hrdwdata-email.
+      ENDIF.
+***Revise
+** Get country where division check isn't mandatory
+      TRY.
+          DATA(ls_tvarvc_intca) = gt_tvarvc_intca[  sign  = zif_einv_constants=>gc_including "'I'
+                                                    option = zif_einv_constants=>gc_equal "'EQ'
+                                                    low = lv_intca_al ].
+        CATCH cx_sy_itab_line_not_found.
+** wouldn't need to error out.
+      ENDTRY.
+
+      TRY.
+          IF ls_hrdwdata-schnum IS NOT INITIAL.
+            DATA(ls_fiorg_map)   = gt_fiorg_map[ cntry = COND #( WHEN lv_cntry = gc_cntry_in THEN gc_cntry_gts
+                                                               ELSE lv_cntry )
+                                              divsn = ls_hrdwdata-spart
+                                              store = ls_hrdwdata-schnum ].
+          ENDIF.
+
+          ls_305-comp_code = ls_fiorg_map-bukrs.
+
+          ls_305-concat_cc = |{ ls_305-comp_code }{ lc_underscore }{ ls_305-kostl }|.
+* Revise
+          IF ls_305-kostl IS INITIAL
+          AND ls_tvarvc_intca-low NE ls_hrdwdata-intca.
+            ls_305-kostl = ls_fiorg_map-kostl.
+          ENDIF.
+          IF ls_305-kostl IS INITIAL.
+
+            et_errors = VALUE #(  BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                            MAPPING ptype = paytyp
+                                                   hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                  error_comment = 'Cost center not found'(008) ) ) ).
+
+            CLEAR:  ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+          IF ls_305-comp_code IS INITIAL.
+            et_errors = VALUE #(  BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                  MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                  error_comment = 'Company code not found FI ORG table'(009) ) ) ).
+
+
+            CLEAR:  ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+        CATCH cx_sy_itab_line_not_found.
+
+          " Begin of Temporary code to solve data issue in Fiorg missing charge store Ashmit
+          IF lt_csks_tv IS NOT INITIAL.
+            TRY.
+                DATA(ls_csks_tv) = lt_csks_tv[ low = ls_hrdwdata-schnum ].
+                ls_305-comp_code = lt_csks[ kostl = ls_csks_tv-high ]-bukrs.
+                ls_305-kostl = ls_csks_tv-high.
+                ls_305-concat_cc = |{ ls_305-comp_code }{ lc_underscore }{ ls_305-kostl }|.
+              CATCH cx_sy_itab_line_not_found.
+                et_errors = VALUE #( BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                            MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                         error_comment = 'Accounting data could not be found in FI ORG table'(007) ) ) ).
+
+                CLEAR:   ls_hrdwdata,ls_305.
+                CONTINUE.
+            ENDTRY.
+          ELSE.
+            et_errors = VALUE #( BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                 MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                       ernam    = sy-uname
+                                       ersda    = sy-datum
+                                       error_comment = 'Accounting data could not be found in FI ORG table'(007) ) ) ).
+
+            CLEAR:   ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+          " END of Temporary code to solve data issue in Fiorg missing charge store
+      ENDTRY.
+
+* get reimbursement currency
+      TRY.
+          DATA(ls_reimb_curr) = gt_reimb_curr[ intca =  ls_305-intca  ].
+          ls_305-reimb_curr = ls_reimb_curr-waers.
+        CATCH cx_sy_itab_line_not_found.
+          IF ls_hrdwdata-opera EQ gc_oper_ind_i.
+
+            et_errors = VALUE #(  BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                  MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                    error_comment = 'Reimbursement currency not found'(010) ) ) ).
+
+            CLEAR:   ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+      ENDTRY.
+* check for the rest of the mandatory concur fields in an insert record
+      IF ls_hrdwdata-opera EQ gc_oper_ind_i.
+
+        "check for first and last names
+        IF ls_305-nachn IS INITIAL OR ls_305-vorna IS INITIAL.
+
+          IF ls_305-nachn IS INITIAL AND ls_305-vorna IS NOT INITIAL.
+            ls_305-nachn = ls_305-vorna.
+          ELSEIF ls_305-vorna IS INITIAL AND ls_305-nachn IS NOT INITIAL.
+            ls_305-vorna = ls_305-nachn.
+          ELSE.
+            et_errors = VALUE #(  BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                  MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                    error_comment = 'Name is Empty'(011) ) ) ).
+
+            CLEAR: ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+
+        ENDIF.
+
+      ENDIF.              "Operation indicator
+
+* get vendor IDs.
+      TRY .
+          DATA(ls_lifnr) = gt_lifnr[ winno = ls_hrdwdata-awinno ].
+
+          ls_305-vendor_id = ls_lifnr-lifnr.
+          IF ls_305-vendor_id IS INITIAL OR ls_305-vendor_id EQ space.
+
+            et_errors = VALUE #( BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                  MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                     error_comment = 'Vendor ID does not exist'(012) ) ) ).
+            CLEAR:   ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+        CATCH cx_sy_itab_line_not_found.
+
+      ENDTRY.
+** Supervisor user ID
+      IF ls_hrdwdata-susrind IS NOT INITIAL.
+        ls_305-approver = ls_hrdwdata-susrind.
+      ENDIF.
+      IF ls_hrdwdata-paybnd IS NOT INITIAL.
+        ls_305-paybnd = ls_hrdwdata-paybnd.
+      ENDIF.
+
+**Mask any sensitive  data in DR3 and QR3
+      IF sy-sysid CS gc_dr3 OR sy-sysid CS gc_qr3.
+
+* get mask flag
+        SELECT SINGLE low FROM tvarvc INTO @DATA(lv_mask)
+                        WHERE name = 'Z_I01289_MASK'.
+        IF lv_mask EQ abap_true AND iv_stage_flg EQ abap_true.
+          CLEAR lv_rndi.
+          CALL FUNCTION 'QF05_RANDOM_INTEGER'
+            EXPORTING
+              ran_int_max   = 9000000
+              ran_int_min   = 1000000
+            IMPORTING
+              ran_int       = lv_rndi
+            EXCEPTIONS
+              invalid_input = 1
+              OTHERS        = 2.
+          ls_305-rand1 = lv_rndi.
+        ENDIF.
+      ENDIF.
+
+*    Expense group
+      SELECT SINGLE default_value FROM zapt_cte_filemap INTO @DATA(lv_expense_group)
+        WHERE app_id  = @gc_concur
+        AND cntry     = @gc_in
+        AND region    = @gc_gts
+        AND source_id = @gc_azure_hrdw
+        AND object_id = @gc_emp_detail
+        AND file_type = @gc_305
+        AND conc_field = @gc_con_fld.
+      IF sy-subrc = 0.
+        ls_305-exp_group = lv_expense_group.
+      ENDIF.
+
+      IF ls_hrdwdata-jcode IS NOT INITIAL.
+        ls_305-jobcd = ls_hrdwdata-jcode.
+      ENDIF.
+
+      IF lv_320_flg EQ abap_true.
+        ls_320-awinno = ls_hrdwdata_c-awinno.
+        ls_320-login_id = ls_305-login_id.
+        APPEND ls_320 TO et_320.
+        CLEAR ls_320.
+        DELETE lt_hrdata WHERE awinno = ls_hrdwdata_c-awinno.
+        "check for first and last names
+        IF ls_305-nachn IS INITIAL OR ls_305-vorna IS INITIAL.
+          IF ls_305-nachn IS INITIAL AND ls_305-vorna IS NOT INITIAL.
+            ls_305-nachn = ls_305-vorna.
+          ELSEIF ls_305-vorna IS INITIAL AND ls_305-nachn IS NOT INITIAL.
+            ls_305-vorna = ls_305-nachn.
+          ELSE.
+            et_errors = VALUE #( BASE et_errors ( VALUE  #( BASE CORRESPONDING #( ls_hrdwdata
+                                                MAPPING ptype = paytyp
+                                                  hdate = joindt  )
+                                         ernam    = sy-uname
+                                         ersda    = sy-datum
+                                    error_comment = 'Name is Empty'(011) ) ) ).
+
+            CLEAR:   ls_hrdwdata,ls_305.
+            CONTINUE.
+          ENDIF.
+        ENDIF.          "Check first and last name
+      ENDIF.
+      IF ls_305 IS NOT INITIAL.
+        ls_305-sysid1 = |{ sy-sysid }{ gc_clnt }{ sy-mandt }|.
+      ENDIF.
+      APPEND ls_305 TO et_305.
+      CLEAR: ls_hrdwdata, ls_hrdwdata_c, ls_305,ls_lifnr,ls_fiorg_map.
+
+    ENDLOOP.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~GET_ACCOUNTING_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~get_accounting_data.
+************************************************************************
+*  Method Name     :   GET_ACCOUNTING_DATA                             *
+*  Object ID       :   I01289                                          *
+*  Title           :                                                   *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/20/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Build accounting data to prepare data to send   *
+*                      CONCUR                                          *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+    DATA: lr_ctry_rg  TYPE RANGE OF land1,
+          lr_ctry_gk  TYPE RANGE OF land1,
+          lr_spart_rg TYPE RANGE OF spart.
+
+
+    CHECK it_hrdata IS NOT INITIAL.
+
+* Build range table for country
+    DATA(lt_hrdw_data) = it_hrdata.
+    SORT lt_hrdw_data BY intca.
+    DELETE ADJACENT DUPLICATES FROM lt_hrdw_data COMPARING intca.
+
+
+    lr_ctry_gk = VALUE #( FOR ls_hrdw_data IN lt_hrdw_data
+                               ( sign = zif_einv_constants=>gc_including
+                                 option = zif_einv_constants=>gc_equal
+                                 low = COND #( WHEN ls_hrdw_data-intca = gc_cntry_in
+                                     THEN gc_cntry_gts
+                                     ELSE ls_hrdw_data-intca ) ) ).
+
+    lr_ctry_rg = VALUE #( FOR ls_hrdw_data IN lt_hrdw_data
+                               ( sign = zif_einv_constants=>gc_including
+                                 option = zif_einv_constants=>gc_equal
+                                 low =  ls_hrdw_data-intca ) ).
+    CLEAR lt_hrdw_data.
+* Build range table for division
+    lt_hrdw_data = it_hrdata.
+    SORT lt_hrdw_data BY spart.
+    DELETE ADJACENT DUPLICATES FROM lt_hrdw_data COMPARING spart.
+
+    lr_spart_rg = VALUE #( FOR ls_hrdw_data IN lt_hrdw_data
+                               ( sign = zif_einv_constants=>gc_including
+                               option = zif_einv_constants=>gc_equal
+                               low = ls_hrdw_data-spart+3(2) ) ).
+
+
+    IF it_hrdata IS NOT INITIAL.
+*      Begin of DR3K940351 A0D0EOY  Flow of field correct and data is sorted
+      SELECT cntry,divsn,store,kostl,bukrs FROM zglt_fiorg_map
+                                                 INTO TABLE @gt_fiorg_map
+                                                 FOR ALL ENTRIES IN @it_hrdata
+                                                 WHERE cntry IN @lr_ctry_gk
+                                                   AND divsn IN @lr_spart_rg
+                                                   AND store = @it_hrdata-schnum.
+      IF sy-subrc EQ 0.
+        SORT gt_fiorg_map BY cntry
+                             divsn
+                             store.
+      ENDIF.
+*      End of DR3K940351 A0D0EOY  Flow of field correct and data is sorted
+    ENDIF.
+* derive reimbursement currency from country code
+    CLEAR gt_reimb_curr.
+    SELECT waers, intca
+      FROM t005
+      INTO TABLE @gt_reimb_curr
+      WHERE intca IN @lr_ctry_rg.
+
+    CLEAR : lr_ctry_rg, lr_ctry_gk, lr_spart_rg,lt_hrdw_data.
+
+* Get the vendor IDs for all associates
+    CLEAR gt_lifnr.
+
+    gt_lifnr = VALUE #( FOR lw_hrdata IN it_hrdata
+                             ( winno = lw_hrdata-awinno ) ).
+* Selecting the countries where have special logic based on country
+    SELECT sign,
+           opti,
+           low
+      FROM tvarvc
+      INTO TABLE @gt_tvarvc_intca
+     WHERE name = @gc_tvarvc_intca
+       AND type = @gc_paytype_s.
+
+    IF gt_lifnr[] IS NOT INITIAL.
+      SORT gt_lifnr BY winno.
+      DELETE ADJACENT DUPLICATES FROM gt_lifnr COMPARING winno.
+
+      SELECT land1,lifnr, stcd2
+        FROM lfa1
+        FOR ALL ENTRIES IN @gt_lifnr
+        WHERE ktokk = @gc_z004
+          AND loevm = @abap_false
+          AND stcd2 = @gt_lifnr-winno
+        INTO TABLE @gt_lifnr.
+
+      IF sy-subrc = 0.
+*  Get existing company code mapping for vendor
+        SELECT lifnr, bukrs
+          FROM lfb1
+          FOR ALL ENTRIES IN @gt_lifnr
+          WHERE lifnr = @gt_lifnr-lifnr
+            AND sperr = @abap_false
+            AND loevm = @abap_false
+          INTO TABLE @gt_comp_code.
+
+*      Begin of DR3K940351 A0D0EOY  data is sorted
+        SORT gt_lifnr.
+*      End of DR3K940351 A0D0EOY  Flow of field correct and data is sorted
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~GET_EMP_RECORDS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [--->] IV_STAGE_FLG                   TYPE        CHAR1(optional)
+* | [<---] ET_750                         TYPE        ZTT_CTE_750
+* | [<---] ET_ERRORS                      TYPE        ZTT_CTE_HRDW_ERROR
+* | [<---] ET_VNDR                        TYPE        ZTT_VENDOR
+* | [<---] ET_305                         TYPE        ZTT_CTIN_305
+* | [<---] ET_720                         TYPE        ZTT_CTE_720
+* | [<---] ET_SAILPNT                     TYPE        ZTT_CTE_SAILPNT
+* | [<---] ET_320                         TYPE        ZTT_CTIN_305
+* | [<---] ET_700                         TYPE        ZTT_CTE_700
+* | [<---] ET_USER_DATA                   TYPE        ZTT_CTE_USERS
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~get_emp_records.
+************************************************************************
+*  Method Name     :   GET_EMP_RECORDS                                 *
+*  Object ID       :   I01289                                          *
+*  Title           :                                                   *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+*
+*----------------------------------------------------------------------*
+
+*get cost center and company code
+    CALL METHOD me->get_accounting_data(
+      EXPORTING
+        it_hrdata = it_hrdata ).
+
+*Fill in the data
+    CALL METHOD me->fill_concurcn_data(
+      EXPORTING
+        it_hrdata    = it_hrdata
+        iv_stage_flg = iv_stage_flg       "flag check masking
+      IMPORTING
+        et_305       = et_305
+        et_errors    = et_errors
+        et_320       = et_320
+                       ).
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~GET_INPUT_FILE_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_IPATH                       TYPE        FILEINTERN
+* | [--->] IV_BPATH                       TYPE        FILEINTERN
+* | [<---] ET_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [<---] ET_ERRORS_DB                   TYPE        ZTT_IDC_HRDW_ERROR
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~get_input_file_data.
+************************************************************************
+*  Method Name     :   GET_INPUT_FILE_DATA                             *
+*  Object ID       :   I01289                                          *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date       Request      Description                      *
+
+*----------------------------------------------------------------------*
+*instantiate object
+    read_hr_file_data(
+      EXPORTING
+        iv_ipath = iv_ipath
+        iv_bpath = iv_bpath
+      IMPORTING
+        et_hrdata = et_hrdata ).
+
+* Read previous errored out records
+    read_error_data(
+      IMPORTING
+        et_errors = et_errors_db
+      CHANGING
+        ct_hrdata = et_hrdata ).
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~GET_LDAP_UPN_EMAIL
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CNTRY                       TYPE        LAND1
+* | [--->] IV_STORE_IND                   TYPE        ZD_STORE_IND
+* | [--->] IV_AUSRID                      TYPE        XUBNAME
+* | [--->] IV_LGORT                       TYPE        ZD_LGORT
+* | [--->] IV_WINNO                       TYPE        ZD_AWINNO
+* | [<---] EV_UPN                         TYPE        ZDE_ARB_USERID
+* | [<---] EV_EMAIL                       TYPE        ZD_CTE_EMAIL
+* | [<---] EV_WINNO                       TYPE        ZD_WIN_NO
+* | [<---] EV_FNAME                       TYPE        VORNA
+* | [<---] EV_LNAME                       TYPE        NACHN
+* | [<---] ES_ERROR                       TYPE        TY_ERR_MSG
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~get_ldap_upn_email.
+************************************************************************
+*  Method Name     :   GET_LDAP_UPN_EMAIL                              *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+*local declarations
+    DATA ls_user_det       TYPE ty_usrdtl.
+    DATA lv_serverid       TYPE ldap_serv.
+    DATA lv_userid_i       TYPE xubname.
+
+    CONSTANTS : lc_win   TYPE string  VALUE 'WM-IDENTIFICATIONNUMBER',
+                lc_samac TYPE string  VALUE 'SAMACCOUNTNAME',
+                lc_fname TYPE string  VALUE 'GIVENNAME',
+                lc_lname TYPE string  VALUE 'SN',
+                lc_upn   TYPE string  VALUE 'USERPRINCIPALNAME',
+                lc_mail  TYPE string  VALUE 'MAIL'.
+
+    CLEAR : es_error, ev_upn, ev_email, ev_winno, ev_fname, ev_lname.
+
+    DATA(lv_userid) = iv_ausrid.
+
+** Get country where division check isn't mandatory
+    TRY.
+        DATA(ls_tvarvc_intca) = gt_tvarvc_intca[  sign = zif_einv_constants=>gc_including "'I'
+                                              option = zif_einv_constants=>gc_equal "'EQ'
+                                                 low = iv_cntry ].
+      CATCH cx_sy_itab_line_not_found.
+** wouldn't need to error out.
+    ENDTRY.
+
+*if the user is from store then concatenate user id, store with .S
+    IF gt_param_map IS INITIAL.
+      SELECT land1,param,value FROM zret_parm_map
+                             INTO TABLE @DATA(lt_param_map).
+      IF sy-subrc IS INITIAL.
+        gt_param_map[] = lt_param_map[].
+      ENDIF.
+    ENDIF.
+
+*to have 2 options for LDAP servers
+    IF iv_store_ind EQ gc_y.
+      TRY.
+          DATA(ls_param_map) = gt_param_map[ land1 = iv_cntry param = gc_ldap_connector_st ].
+        CATCH cx_sy_itab_line_not_found.
+          es_error-message = 'LDAP Connector Associate not found'(002).
+          RETURN.
+      ENDTRY.
+    ELSE.
+      TRY.
+          ls_param_map = gt_param_map[ land1 = iv_cntry param = gc_ldap_connector ].
+        CATCH cx_sy_itab_line_not_found.
+          es_error-message = 'LDAP Connector Associate not found'(002).
+          RETURN.
+      ENDTRY.
+    ENDIF.
+
+    IF iv_cntry EQ zif_einv_constants=>gc_gj.
+* Passing User ID
+      ls_user_det-usrid = iv_ausrid.
+    ELSE.
+      "Passing the WIN number to extract
+      ls_user_det-usrid = iv_winno.
+    ENDIF.
+
+*get the LDAP server
+    lv_serverid = ls_param_map-value.
+
+*get LDAP data
+    CALL METHOD zmpucl_arb_utility_class=>ldap_connectivity
+      EXPORTING
+        is_userid = ls_user_det                             "Win number
+        is_servid = lv_serverid
+        iv_cntry  = iv_cntry
+      IMPORTING
+        es_error  = es_error
+        et_ldap   = DATA(lt_ldap).
+
+
+    IF es_error IS NOT INITIAL.
+      RETURN.
+    ENDIF.
+
+*if no error get the user id
+    TRY.
+        DATA(lt_ldap_values) = lt_ldap[ 1 ]-ldap.
+        DATA(lt_ldap_attr) = lt_ldap_values[ 1 ]-attributes.
+
+*-- UPN
+        IF ev_upn IS REQUESTED.
+          TRY.
+              DATA(lt_upn) = lt_ldap_attr[ name = lc_upn ]-vals. "'USERPRINCIPALNAME'
+              DATA(lv_val) = lt_upn[ 1 ]-val.
+
+            CATCH cx_sy_itab_line_not_found.
+              IF iv_cntry NE ls_tvarvc_intca-low.  "No error message for China
+                es_error-message = |{ lv_userid } | && text-005.
+                RETURN.
+              ENDIF.
+          ENDTRY.
+        ENDIF.
+
+*-- Winno
+        IF ev_winno IS REQUESTED.
+          TRY.
+              DATA(lt_winno) = lt_ldap_attr[ name = lc_win ]-vals.
+              DATA(lv_winno) = lt_winno[ 1 ]-val.
+
+            CATCH cx_sy_itab_line_not_found.
+              IF iv_cntry NE ls_tvarvc_intca-low.
+                es_error-message = |{ lv_userid } | && text-005.
+                RETURN.
+              ENDIF.
+          ENDTRY.
+        ENDIF.
+
+*-- First Name
+        IF ev_fname IS REQUESTED.
+          TRY.
+              DATA(lt_fname) = lt_ldap_attr[ name = lc_fname ]-vals.
+              DATA(lv_fname) = lt_fname[ 1 ]-val.
+
+            CATCH cx_sy_itab_line_not_found.
+              IF iv_cntry NE ls_tvarvc_intca-low.  "
+                es_error-message = |{ lv_userid } | && text-005. "
+                RETURN.
+              ENDIF.
+          ENDTRY.
+        ENDIF.
+
+*-- Last Name
+        IF ev_lname IS REQUESTED.
+          TRY.
+              DATA(lt_lname) = lt_ldap_attr[ name = lc_lname ]-vals.
+              DATA(lv_lname) = lt_lname[ 1 ]-val.
+
+            CATCH cx_sy_itab_line_not_found.
+              IF iv_cntry NE ls_tvarvc_intca-low.
+                es_error-message = |{ lv_userid } | && text-005.
+                RETURN.
+              ENDIF.
+          ENDTRY.
+        ENDIF.
+
+** Get email and do not pass an error.
+        IF ev_email IS REQUESTED.
+          TRY.
+              DATA(lt_email) = lt_ldap_attr[ name = lc_mail ]-vals. "
+              DATA(lv_email) = lt_email[ 1 ]-val.
+
+            CATCH cx_sy_itab_line_not_found.
+              IF iv_cntry NE ls_tvarvc_intca-low.  "No error message for China
+                es_error-message = |{ lv_userid } | && text-005. "|not found on AD server |(009).
+                RETURN.
+              ENDIF.
+          ENDTRY.
+        ENDIF.
+
+      CATCH cx_sy_itab_line_not_found.
+        es_error-message = |{ lv_userid } | && text-004..
+        RETURN.
+    ENDTRY.
+
+****user id
+    ev_upn = lv_val.
+    ev_email = lv_email.
+    ev_winno = lv_winno.
+    ev_fname = lv_fname.
+    ev_lname = lv_lname.
+
+    CLEAR : lt_ldap_values,lv_lname,lt_lname,lv_fname,lt_fname,lv_email,lv_userid.
+    CLEAR : lv_val,lt_upn,lt_ldap_attr,lv_serverid,ls_param_map.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~INITIATE_PARALLEL_PROCESSING
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_SERVER                      TYPE        RZLLI_APCL
+* | [--->] IV_THRDS                       TYPE        NUMC3
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [<---] EX_EXCEPTION                   TYPE        CHAR1
+* | [<---] EX_RCV_JOBS                    TYPE        I
+* | [<---] EX_SEND_JOBS                   TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~initiate_parallel_processing.
+************************************************************************
+*  Method Name     :   INITIATE_PARALLEL_PROCESSING                    *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+
+*-- Local Table Decleration's
+    DATA : lt_hrdata TYPE ztt_hrdw_azure.        " Local HRDW table
+
+*-- Local Variable Decleration's
+    DATA  : lv_taskname                   TYPE char20,                "Store the task name
+            lv_parallel_process_exit_flag TYPE abap_bool,             "Parallel Process exit flag
+            lv_success_flag               TYPE abap_bool  ##NEEDED,   "Success Flag
+            lo_parallel_processing        TYPE REF TO zcl_ar_ams_parallel_processing.
+    CREATE OBJECT lo_parallel_processing.
+
+*-- Local Constant decleration's
+    CONSTANTS : lc_text(12) TYPE c VALUE 'HRDWtoConcur'.
+
+
+    CHECK it_hrdata IS NOT INITIAL.
+
+    DESCRIBE TABLE it_hrdata LINES DATA(lv_no_rec).
+
+*-- Numbers of records per process
+    DATA(lv_rec_per_wp) = lv_no_rec DIV iv_thrds.
+
+*-- If the number of records are less than threads
+*    distribute users across the threads
+    IF lv_rec_per_wp EQ 0 AND
+       lv_no_rec BETWEEN 1 AND iv_thrds.
+      DATA(lv_loop_times) = lv_no_rec.
+    ELSE.
+      lv_loop_times = iv_thrds.
+    ENDIF.
+
+*-- Begin parallel processing
+    DATA(lv_from) = 1.
+    DO .
+
+      DATA(lv_index) = sy-index.
+
+*-- Formulate task name
+      lv_taskname = lv_index.
+      CONDENSE lv_taskname.
+      lv_taskname = |{ lc_text }| && |{ zif_mpu_constants=>gc_underscore }| && |{ lv_taskname }|.
+
+*-- Formulate the from and to values
+*    Calculate the number of loops remaining
+      DATA(lv_remaining) = lv_loop_times - ex_send_jobs.
+
+*-- If final loop update the to records as the final number of records
+      IF lv_remaining EQ 1.
+        DATA(lv_to) = lv_no_rec.
+      ELSE.
+        "update the to value with the number of work process
+        lv_to = lv_from + lv_rec_per_wp.
+      ENDIF.
+      CLEAR : lt_hrdata,lv_remaining.
+      APPEND LINES OF it_hrdata FROM lv_from TO lv_to TO lt_hrdata.
+
+*-- Call function for parallel processing - HRDW to Ariba
+      CALL FUNCTION 'Z_HR_DETAILS_BUILD'
+        STARTING NEW TASK lv_taskname
+        DESTINATION IN GROUP iv_server
+        CALLING collect_results ON END OF TASK
+        EXPORTING
+          it_hrdata             = lt_hrdata
+          iv_stage_flg          = abap_true
+        EXCEPTIONS
+          communication_failure = 1   "Destination server not
+          system_failure        = 2   "Program or other internal
+          resource_failure      = 3   "No work processes are
+          OTHERS                = 4.  "Any other errors.
+      IF sy-subrc IS INITIAL.
+*-- Increase the sent jobs count and the range.
+        ex_send_jobs = ex_send_jobs + 1.
+        lv_from = lv_to + 1.
+      ENDIF.
+
+*-- Check the RFC response.
+      CLEAR : lv_parallel_process_exit_flag , lv_success_flag.
+      lo_parallel_processing->check_fm_result( EXPORTING iv_fm_sy_subrc_result = sy-subrc
+                                               IMPORTING ev_exit_flag = lv_parallel_process_exit_flag
+                                                         ev_success_flag = lv_success_flag ).
+
+*-- If exit flag is raised , Exception is rasied.
+      IF lv_parallel_process_exit_flag EQ abap_true.
+        ex_exception = abap_true.
+        EXIT.
+      ENDIF.
+
+*-- Exit the loop if all the records have been sent for processing
+      IF ex_send_jobs EQ lv_loop_times.
+        EXIT.
+      ENDIF.
+    ENDDO.
+
+*-- keep the program  running until all tasks are returned.
+    DO .
+      IF ex_send_jobs EQ gv_rcv_jobs.
+        EXIT.
+      ENDIF.
+      WAIT UP TO 1 SECONDS.
+    ENDDO.
+   ex_rcv_jobs = gv_rcv_jobs.
+*-- Clearing data
+    CLEAR : lv_from,lv_to,lv_taskname,lv_index,
+            lv_loop_times,lt_hrdata,lv_remaining,lv_rec_per_wp.
+
+    lo_parallel_processing->free_private_values( ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~PARALLEL_PROCESSING
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_SERVER                      TYPE        RZLLI_APCL
+* | [--->] IV_THRDS                       TYPE        NUMC3
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [<---] EX_ERROR_UPDATE                TYPE        CHAR1
+* | [<---] EX_EXCEPTION                   TYPE        CHAR1
+* | [<---] EX_RCV_JOBS                    TYPE        I
+* | [<---] EX_SEND_JOBS                   TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~parallel_processing.
+************************************************************************
+*  Method Name     :   PARALLEL_PROCESSING                             *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+*-- Local Declaration's
+    DATA: lo_except              TYPE REF TO zcx_ams_exceptions  ##NEEDED,  " Parallel Processing class exception
+          lv_server_available    TYPE abap_bool,                                        " Server Available
+          lv_rfcgr               TYPE rzlli_apcl,                                       " Server group
+          lv_wait_count          TYPE i,                                                " Wait Count
+          lo_parallel_processing TYPE REF TO zcl_ar_ams_parallel_processing,
+          lv_exception           TYPE char1.                                            " Exception flag.
+
+    CREATE OBJECT lo_parallel_processing.
+
+*-- Server from the input.
+    lv_rfcgr = iv_server.
+
+*-- Wait Count
+    lv_wait_count = 10.
+
+    CLEAR: lv_exception.
+
+*-- Server Validation
+    TRY .
+        lo_parallel_processing->server_validation( EXPORTING iv_srv_gr = lv_rfcgr
+                                                             iv_initialserver_wait_count = lv_wait_count
+                                                   IMPORTING ev_available = lv_server_available ) .
+      CATCH zcx_ams_exceptions INTO lo_except.                                           ##NEEDED
+*-- If exception, raise an error message.
+        MESSAGE e286(b1) WITH iv_server.
+    ENDTRY.
+
+*-- If server is available , Initiate Parallel Processing
+    IF lv_server_available EQ abap_true .
+*-- Initiate Parallel Processing.
+      initiate_parallel_processing(
+        EXPORTING
+          iv_server    = iv_server    " Logon/Server Group Name
+          iv_thrds     = iv_thrds    " Numc3, internal use
+          it_hrdata    = it_hrdata    " Table type for HRDW data
+        IMPORTING
+          ex_exception = ex_exception    " Single-Character Indicator
+          ex_rcv_jobs  = ex_rcv_jobs
+          ex_send_jobs = ex_send_jobs
+      ).
+
+    ENDIF.
+
+    IF lv_exception IS NOT INITIAL.
+      ex_error_update = abap_true.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~PREP_DATA_FOR_UPDATE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [--->] IT_VNDR                        TYPE        ZTT_VENDOR(optional)
+* | [<---] ET_USER_UPD                    TYPE        ZTT_CTE_USERS
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~prep_data_for_update.
+************************************************************************
+*  Method Name     :   PREP_DATA_FOR_UPDATE                            *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Fill or derive the fields required for Concur   *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+    DATA: ls_user_upd TYPE zfapt_cte_users,
+          ls_320      TYPE zctin_305.
+    DATA: lt_user_upd  TYPE STANDARD TABLE OF zfapt_cte_users,
+          lt_error_del TYPE TABLE OF zfapt_hrdw_error.
+
+
+*get the data from DB table to check if it is update or insert
+    IF gt_305 IS NOT INITIAL.
+      SELECT * FROM zfapt_cte_users INTO TABLE @DATA(lt_users)
+               FOR ALL ENTRIES IN @gt_305
+               WHERE empid = @gt_305-awinno.
+    ENDIF.
+
+    DATA(lt_305) = gt_305.
+
+    LOOP AT lt_users INTO DATA(ls_users).
+      READ TABLE it_hrdata INTO DATA(ls_hrdata1) WITH KEY awinno = ls_users-empid.
+      READ TABLE gt_305 INTO DATA(ls_305) WITH KEY awinno = ls_users-empid.
+      IF sy-subrc = 0.
+
+        ls_user_upd = CORRESPONDING #( ls_users ).
+
+        IF ls_hrdata1-spart IS NOT INITIAL.
+          ls_user_upd-spart = | { ls_hrdata1-spart ALPHA = OUT } |.
+        ENDIF.
+** Pay type
+        IF ls_hrdata1-paytyp IS NOT INITIAL
+          AND ls_users-ptype NE ls_hrdata1-paytyp.
+          ls_user_upd-ptype = ls_hrdata1-paytyp.
+        ENDIF.
+*check if login id chnaged to generate the 320 record.
+        IF ls_305-login_id IS NOT INITIAL AND
+           ls_users-logid NE ls_305-login_id.
+          ls_user_upd-logid = ls_305-login_id.
+** To capture the 320 results or When user ID been changed.
+          READ TABLE gt_320 INTO ls_320 WITH KEY awinno = ls_users-empid.
+          IF sy-subrc IS INITIAL.
+            ls_user_upd-logchg = abap_true.
+          ENDIF.
+        ENDIF.
+        IF sy-sysid CS 'DR3'.
+** To capture the 320 results or When user ID been changed.
+          READ TABLE gt_320 INTO ls_320 WITH KEY awinno = ls_users-empid.
+          IF sy-subrc IS INITIAL.
+            ls_user_upd-logchg = abap_true.
+          ENDIF.
+        ENDIF.
+
+*check for active flag
+        IF ls_305-active IS NOT INITIAL.
+          ls_user_upd-active = ls_305-active.
+        ENDIF.
+*check for cost center.
+        IF ls_305-kostl IS NOT INITIAL AND
+           ls_users-kostl NE ls_305-kostl.
+          ls_user_upd-kostl = ls_305-kostl.
+        ENDIF.
+*check for company code
+        IF ls_305-comp_code IS NOT INITIAL AND
+         ls_users-comp_code NE ls_305-comp_code.
+          ls_user_upd-comp_code = ls_305-comp_code.
+        ENDIF.
+*check for email id
+        IF ls_305-email IS NOT INITIAL AND                  "Email
+         ls_users-email NE ls_305-email.
+          ls_user_upd-email = ls_305-email.
+        ENDIF.
+
+* Check for expanse group
+        IF ls_305-exp_group IS NOT INITIAL                   "Expense Group
+          AND ls_user_upd-exp_group NE ls_305-exp_group.
+          ls_user_upd-exp_group = ls_305-exp_group.
+        ENDIF.
+
+*check for supervisor
+        IF ls_305-swinno IS NOT INITIAL AND
+         ls_users-swinno NE ls_305-swinno.
+          ls_user_upd-swinno = ls_305-swinno.
+        ENDIF.
+
+        IF ls_hrdata1-vorna IS NOT INITIAL.
+          ls_user_upd-vorna = ls_hrdata1-vorna.
+        ENDIF.
+        IF ls_305-nachn IS NOT INITIAL AND
+         ls_users-nachn NE ls_305-nachn.
+          ls_user_upd-nachn = ls_305-nachn.
+        ENDIF.
+        IF ls_305-midnm IS NOT INITIAL AND
+         ls_users-midnm NE ls_305-midnm.
+          ls_user_upd-midnm = ls_305-midnm.
+        ENDIF.
+*Check for vendor and exp group
+
+        IF ls_users-vendor_id NE ls_305-vendor_id.
+          ls_user_upd-vendor_id = ls_305-vendor_id.
+        ENDIF.
+
+        IF ls_305-intca IS NOT INITIAL AND                "Country
+          ls_users-intca NE ls_305-intca.
+          ls_user_upd-intca = ls_305-intca.
+        ENDIF.
+
+        IF ls_305-land1 IS NOT INITIAL AND                "LAND1
+          ls_users-land1 NE ls_305-land1.
+          ls_user_upd-land1 = ls_305-land1.
+        ENDIF.
+
+        IF ls_305-ctry_subcode IS NOT INITIAL AND         "sub Country code
+         ls_users-ctry_subcode NE ls_305-ctry_subcode.
+          ls_user_upd-ctry_subcode = ls_305-ctry_subcode.
+        ENDIF.
+        IF ls_305-reimb_curr IS NOT INITIAL AND           "Currency key
+         ls_users-reimb_curr NE ls_305-reimb_curr.
+          ls_user_upd-reimb_curr = ls_305-reimb_curr.
+        ENDIF.
+        IF ls_305-hdate IS NOT INITIAL AND                "Hire date
+         ls_users-hdate NE ls_305-hdate.
+          ls_user_upd-hdate = ls_305-hdate.
+        ENDIF.
+        IF ls_305-paybnd IS NOT INITIAL AND               "Pay Band
+         ls_users-paybnd NE ls_305-paybnd.
+          ls_user_upd-paybnd = ls_305-paybnd.
+        ENDIF.
+
+        ls_user_upd-deptno = ls_hrdata1-deptno.           " Dept. No
+
+
+        IF ls_305-bname IS NOT INITIAL.
+          ls_user_upd-bname = ls_305-bname.
+        ENDIF.
+
+        IF ls_305-nachn IS NOT INITIAL.
+          ls_user_upd-nachn = ls_305-nachn.
+        ENDIF.
+** extra fields update for reference
+        IF ls_hrdata1-regio IS NOT INITIAL.
+          ls_user_upd-regio = ls_hrdata1-regio.
+        ENDIF.
+        IF ls_hrdata1-state IS NOT INITIAL.
+          ls_user_upd-state = ls_hrdata1-state.
+        ENDIF.
+
+* Check for Concat_CC field
+        IF ls_305-concat_cc IS NOT INITIAL AND
+          ls_user_upd-concat_cc NE ls_305-concat_cc.
+          ls_user_upd-concat_cc = ls_305-concat_cc.
+        ENDIF.
+
+* Clear rollout flag every time the record gets updated
+* Roll Out Flag should not be reset as data sent to concur should reflect in Table
+*        CLEAR: ls_user_upd-rollout.
+
+        IF ls_hrdata1-lgort IS NOT INITIAL.
+          ls_user_upd-lgort = ls_hrdata1-lgort.
+        ENDIF.
+        IF ls_hrdata1-lgort_old IS NOT INITIAL.
+          ls_user_upd-lgort_old = ls_hrdata1-lgort_old.
+        ENDIF.
+        IF ls_hrdata1-slgort IS NOT INITIAL.
+          ls_user_upd-slgort = ls_hrdata1-slgort.
+        ENDIF.
+        IF ls_hrdata1-jclass IS NOT INITIAL.
+          ls_user_upd-jclass = ls_hrdata1-jclass.
+        ENDIF.
+        IF ls_hrdata1-jcode IS NOT INITIAL.
+          ls_user_upd-jcode = ls_hrdata1-jcode.
+        ENDIF.
+        IF ls_hrdata1-locat IS NOT INITIAL.
+          ls_user_upd-stras = ls_hrdata1-locat.
+        ENDIF.
+        IF ls_hrdata1-ort01 IS NOT INITIAL.
+          ls_user_upd-ort01 = ls_hrdata1-ort01.
+        ENDIF.
+
+        ls_user_upd-pstlz = ls_hrdata1-pstlz.       "Postal Code
+
+
+        IF ls_hrdata1-hrsrc IS NOT INITIAL.
+          ls_user_upd-hrsrc = ls_hrdata1-hrsrc.
+        ENDIF.
+
+        IF ls_hrdata1-jcode IS NOT INITIAL.
+          ls_user_upd-jobcd = ls_hrdata1-jcode.
+        ENDIF.
+** extra fields for reference
+** update approval limit
+        IF ls_305-approver IS NOT INITIAL.
+          ls_user_upd-approver = ls_305-approver.
+        ENDIF.
+        IF ls_305-gender IS NOT INITIAL.
+          ls_user_upd-gender = ls_305-gender.
+        ENDIF.
+
+        IF ls_305-custom1 IS NOT INITIAL AND               "HRBP
+           ls_users-custom1 NE ls_305-custom1.
+          ls_user_upd-custom1 = ls_305-custom1.
+        ENDIF.
+        IF ls_305-custom2 IS NOT INITIAL AND               "HRBP Ind.
+          ls_users-custom2 NE ls_305-custom2.
+          ls_user_upd-custom2 = ls_305-custom2.
+        ENDIF.
+        CLEAR: ls_user_upd-job_level.
+        IF ls_user_upd IS NOT INITIAL.
+          ls_user_upd-chgdat = sy-datum.
+          ls_user_upd-updusr = sy-uname.
+          APPEND ls_user_upd TO et_user_upd.
+          DELETE lt_305 WHERE awinno = ls_user_upd-empid.
+        ENDIF.
+        CLEAR: ls_user_upd,ls_users,ls_305.
+      ENDIF.
+    ENDLOOP.
+
+* process the remaining records to update
+    LOOP AT lt_305 INTO ls_305.
+      READ TABLE it_hrdata INTO DATA(ls_hrdata) WITH KEY awinno = ls_305-awinno.
+      IF sy-subrc IS INITIAL.
+        IF ls_hrdata-opera EQ zif_ap_cte_constants=>gc_d.
+* For XPAT/Executive's the ACTWIN & country comes separate delete record
+* one record should be eliminated.
+* There might be a case when there is an insert request along with delete request for the given WIN
+* Add extra validation for Insert request
+          TRY.
+              DATA(ls_hrdat1) = it_hrdata[ awinno = ls_305-awinno
+                                           opera  = gc_i ].
+              CLEAR: ls_hrdat1.
+            CATCH cx_sy_itab_line_not_found.
+              CONTINUE.
+          ENDTRY.
+        ENDIF.
+*** in order to fill the details which are needed to update the table for future.
+        MOVE-CORRESPONDING ls_hrdata TO ls_user_upd.
+        IF ls_hrdata-spart IS NOT INITIAL.
+          ls_user_upd-spart = |{ ls_hrdata-spart ALPHA = OUT }|.
+        ENDIF.
+      ENDIF.
+
+      MOVE-CORRESPONDING ls_305 TO ls_user_upd.
+*check for mandatory parameters as it is new record
+      IF ls_305-login_id IS INITIAL OR
+         ls_305-vorna IS INITIAL OR
+        ls_305-nachn IS INITIAL OR
+        ls_305-kostl IS INITIAL OR
+        ls_305-comp_code IS INITIAL.
+
+        IF ls_hrdata IS NOT INITIAL.
+          "append to error records and continue with ext record
+          gt_errors = VALUE #( BASE gt_errors ( VALUE #( BASE CORRESPONDING #( ls_hrdata )
+                                  ernam = sy-uname
+                                  ersda = sy-datum
+                                   error_comment = 'Mandatory values missing'(020) ) ) ).
+          CLEAR : ls_user_upd, ls_305,ls_hrdata.
+          CONTINUE.
+        ENDIF.
+      ENDIF.
+      ls_user_upd-empid = ls_305-awinno.
+      ls_user_upd-logid = ls_305-login_id.
+      ls_user_upd-email = ls_305-email.
+      ls_user_upd-updusr = sy-uname.
+      ls_user_upd-credat = sy-datum.
+      ls_user_upd-chgdat = sy-datum.
+      IF ls_305-approver IS NOT INITIAL.
+        ls_user_upd-approver = ls_305-approver.
+      ENDIF.
+
+** To capture the 320 results or when user ID been changed.
+      READ TABLE gt_320 INTO ls_320 WITH KEY awinno = ls_user_upd-empid.
+      IF sy-subrc IS INITIAL.
+        ls_user_upd-logchg = abap_true.
+      ENDIF.
+** Pay type
+      IF ls_hrdata-paytyp IS NOT INITIAL.
+        ls_user_upd-ptype = ls_hrdata-paytyp.
+      ENDIF.
+
+* HR Source Code
+      IF ls_hrdata-hrsrc IS NOT INITIAL.
+        ls_user_upd-hrsrc = ls_hrdata-hrsrc.
+      ENDIF.
+
+      APPEND ls_user_upd TO et_user_upd.
+      CLEAR: ls_user_upd,ls_305.
+    ENDLOOP.
+
+
+*-- formulate the error table values
+    LOOP AT gt_errors_db INTO DATA(ls_error_db).
+
+      TRY.
+          DATA(ls_errors) = gt_errors[ awinno = ls_error_db-awinno ].
+
+        CATCH cx_sy_itab_line_not_found.
+          gt_error_del  = VALUE #( BASE gt_error_del ( CORRESPONDING #( ls_error_db ) ) ) .
+
+      ENDTRY.
+      CLEAR : ls_error_db.
+
+    ENDLOOP.
+
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~PROCESS_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_PRLPR                       TYPE        CHAR1
+* | [--->] IT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* | [--->] IV_STAGE_FLG                   TYPE        CHAR1(optional)
+* | [--->] IV_SERVER                      TYPE        RZLLI_APCL
+* | [--->] IV_THRDS                       TYPE        NUMC3(optional)
+* | [<---] ET_750                         TYPE        ZTT_CTE_750
+* | [<---] ET_ERRORS                      TYPE        ZTT_CTE_HRDW_ERROR
+* | [<---] ET_VNDR                        TYPE        ZTT_VENDOR
+* | [<---] ET_USER_DATA                   TYPE        ZTT_CTE_USERS
+* | [<---] ET_305                         TYPE        ZTT_CTE_305
+* | [<---] ET_720                         TYPE        ZTT_CTE_720
+* | [<---] ET_SAILPNT                     TYPE        ZTT_CTE_SAILPNT
+* | [<---] ET_320                         TYPE        ZTT_CTE_305
+* | [<---] ET_700                         TYPE        ZTT_CTE_700
+* | [<---] EX_ERROR_UPDATE                TYPE        CHAR1
+* | [<---] EX_EXCEPTION                   TYPE        CHAR1
+* | [<---] EX_RCV_JOBS                    TYPE        I
+* | [<---] EX_SEND_JOBS                   TYPE        I
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~process_data.
+************************************************************************
+*  Method Name     :   GET_EMP_RECORDS                                 *
+*  Object ID       :   I01289                                          *
+*  Title           :                                                   *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+*
+*----------------------------------------------------------------------*
+
+
+    IF iv_prlpr IS INITIAL.
+*    get the concur data
+      get_emp_records(
+        EXPORTING it_hrdata = it_hrdata
+                  iv_stage_flg = iv_stage_flg
+                  "for random number generation in dev/Q for masking
+        IMPORTING et_305     = gt_305
+                  et_errors  = gt_errors
+                  et_320     = gt_320
+      ).
+    ELSE.
+      parallel_processing(
+        EXPORTING
+          iv_server       = iv_server       " Logon/Server Group Name
+          iv_thrds        = iv_thrds        " Numc3, internal use
+          it_hrdata       = it_hrdata       " Table type for HRDW data
+        IMPORTING
+          ex_error_update = ex_error_update    " Single-Character Indicator
+          ex_exception    = ex_exception       " Single-Character Indicator
+          ex_rcv_jobs     = ex_rcv_jobs
+          ex_send_jobs    = ex_send_jobs
+      ).
+    ENDIF.
+
+    prep_data_for_update( EXPORTING it_hrdata = it_hrdata
+                           IMPORTING et_user_upd = gt_user_upd ).
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~READ_ADHOC_USERS
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_ADH_USER                    TYPE        ZTT_CTE_ADH_USR
+* | [<-->] CT_HRDATA                      TYPE        ZTT_CTE_HRDWDATA
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~read_adhoc_users.
+************************************************************************
+*  Method Name     :   READ_ADHOC_USERS                             *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+*----------------------------------------------------------------------*
+    DATA: lt_adhoc_users TYPE TABLE OF zapt_cte_adh_usr,
+          lt_hrdw_data   TYPE ztt_cte_hrdwdata.
+
+    DATA ls_hrdw_data TYPE zctes_hrdwdata.
+
+* Get ad-hoc users from custom table to be created in concur
+    SELECT * FROM zapt_cte_adh_usr
+      INTO TABLE lt_adhoc_users.
+    IF sy-subrc = 0.
+      LOOP AT lt_adhoc_users INTO DATA(ls_adhoc_user).
+        MOVE-CORRESPONDING ls_adhoc_user TO ls_hrdw_data.
+        ls_hrdw_data-ausrid = ls_adhoc_user-usrid.
+        APPEND ls_hrdw_data TO lt_hrdw_data.
+        CLEAR : ls_hrdw_data,ls_adhoc_user.
+      ENDLOOP.
+      APPEND LINES OF lt_hrdw_data TO ct_hrdata.
+      et_adh_user = lt_adhoc_users.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~READ_CC_FILE_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_IPATH                       TYPE        FILEINTERN
+* | [<---] ET_CCDATA                      TYPE        ZTT_APS_CON_CC_HRDW
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~read_cc_file_data.
+
+************************************************************************
+*  Method Name     :   READ_CC_FILE_DATA                               *
+*  Object ID       :   I01289                                          *
+*  Title           :   Execute process for Cost center owner & tech    *
+*                      org file to store in staging table              *
+*  Author          :   Venkatesh Pelli                                 *
+*  Country         :   IN                                              *
+*  Creation Date   :   12-Sep-2022                                     *
+*  Description     :   Read,validate and archive file                  *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request      Description                     *
+* VN532TM     09/12/2022  DR3K938940  Initial                          *
+*----------------------------------------------------------------------*
+
+
+    "Data Declarations
+    DATA:
+      lt_file_input TYPE STANDARD TABLE OF tty_file_input,
+      ls_cc_data    TYPE zapt_con_cc_hrdw,
+      lv_nullchar   TYPE xstring VALUE '0',
+      lv_cc_owner   TYPE xstring,
+      ltr_kostl     TYPE RANGE OF kostl.   " A0d0eoy
+
+    CLEAR: gt_filelist, gv_file_path.
+
+* Validate file path
+    CALL METHOD me->zfapif_hr_master_data_concur~validate_input_file
+      EXPORTING
+        iv_ipath = iv_ipath.
+
+
+
+* Read file data
+    CALL METHOD me->read_input_file
+      IMPORTING
+        et_file_data = lt_file_input.
+
+    "Get CC Config with prefix
+    SELECT low,high FROM tvarvc INTO TABLE @DATA(lt_tvarvc)
+      WHERE name = @gc_cc_suffix_name.
+    IF sy-subrc = 0.
+      SORT lt_tvarvc BY low.
+    ENDIF.
+
+    DATA(lt_tvarvc_tmp) = lt_tvarvc.
+    SORT lt_tvarvc_tmp BY low.
+    DELETE ADJACENT DUPLICATES FROM lt_tvarvc_tmp COMPARING low.
+    IF lt_tvarvc_tmp IS NOT INITIAL.
+      SELECT kostl,bukrs FROM zglt_fiorg_map INTO TABLE @DATA(lt_fiorg_map) "#EC CI_NOFIELD
+      FOR ALL ENTRIES IN @lt_tvarvc_tmp
+      WHERE bukrs = @lt_tvarvc_tmp-low+0(4).
+      IF sy-subrc EQ 0.
+        SORT lt_fiorg_map BY kostl.
+      ENDIF.
+    ENDIF.
+
+
+
+    " Begin of Temporary code to solve data issue in Fiorg missing charge store Ashmit
+    SELECT *
+      FROM tvarvc
+      INTO TABLE @DATA(lt_csks_tv)
+      WHERE name EQ 'Z_I01289_CSKS_STORE'.
+    IF sy-subrc EQ 0.
+      ltr_kostl = VALUE #( FOR ls_csks_tvtmp IN lt_csks_tv ( sign   = 'I'
+                                                             option = 'EQ'
+                                                             low    = ls_csks_tvtmp-high ) ).
+      SELECT kostl
+        FROM csks
+        INTO TABLE @DATA(lt_csks)
+        WHERE kostl IN @ltr_kostl.
+      IF sy-subrc NE 0.
+        CLEAR lt_csks.
+      ENDIF.
+    ENDIF.
+    " End of Temporary code to solve data issue in Fiorg missing charge store
+
+
+
+    " Fill file data to CC HRDW DB format table
+    LOOP AT lt_file_input INTO DATA(ls_file_input).
+
+      DATA(lv_kostl) = CONV kostl( ls_file_input-kostl ).
+      SEARCH lt_fiorg_map FOR lv_kostl AND MARK.
+      IF sy-subrc NE 0.
+        " Begin of Temporary code to solve data issue in Fiorg missing charge store Ashmit
+        IF lt_csks IS NOT INITIAL.
+          LOOP AT lt_csks INTO DATA(ls_csks)
+            WHERE kostl CS lv_kostl.
+            lv_kostl = ls_csks-kostl.
+          ENDLOOP.
+          IF sy-subrc NE 0.
+            CONTINUE.
+          ENDIF.
+*          TRY.
+*              lv_kostl = lt_csks[ kostl = lv_kostl ]-kostl.
+*            CATCH cx_sy_itab_line_not_found.
+*              CONTINUE.
+*          ENDTRY.
+        ELSE.
+          " END of Temporary code to solve data issue in Fiorg missing charge store Ashmit
+          CONTINUE.
+        ENDIF.
+      ELSE.
+        READ TABLE lt_fiorg_map INTO DATA(ls_fiorg_map) INDEX sy-tabix.
+        IF sy-subrc EQ 0.
+          lv_kostl = ls_fiorg_map-kostl.
+        ENDIF.
+      ENDIF.
+
+      ls_cc_data-kostl     =  lv_kostl.
+
+      ls_cc_data-del_item_flag   =  ls_file_input-del_item_flag.
+      ls_cc_data-level01   =  ls_file_input-level01.
+      ls_cc_data-level02   =  ls_file_input-level02.
+      ls_cc_data-level04   =  ls_file_input-level04.
+      ls_cc_data-level05   =  ls_file_input-level05.
+      ls_cc_data-level06   =  ls_file_input-level06.
+      ls_cc_data-level07   =  ls_file_input-level07.
+      ls_cc_data-level08   =  ls_file_input-level08.
+      ls_cc_data-level09   =  ls_file_input-level09.
+      ls_cc_data-level10   =  ls_file_input-level10.
+
+      ls_cc_data-level03   =  ls_file_input-level03.
+      DATA(lv_cc_length) = strlen( ls_file_input-kostl ).
+
+      DATA(lv_level03) = CONV char20(  |{ ls_file_input-kostl }| & | | & |{ ls_file_input-kostl+2(lv_cc_length) }| ).
+      IF ls_file_input-level03 CS lv_level03.
+        REPLACE FIRST OCCURRENCE OF lv_level03 IN ls_cc_data-level03 WITH ''.
+        CONDENSE ls_cc_data-level03.
+      ELSE.
+        lv_level03 = |{ ls_file_input-kostl }| & | | & |{ ls_file_input-kostl }|.
+        IF ls_file_input-level03 CS lv_level03.
+          REPLACE FIRST OCCURRENCE OF lv_level03 IN ls_cc_data-level03 WITH ''.
+          CONDENSE ls_cc_data-level03.
+        ENDIF.
+      ENDIF.
+
+
+      ls_cc_data-tech_org_emailid	 = 	ls_file_input-tech_org_emailid.
+      ls_cc_data-cc_owner	 = 	ls_file_input-cc_owner.
+      lv_cc_owner = ls_cc_data-cc_owner.
+      SHIFT lv_cc_owner LEFT DELETING LEADING lv_nullchar IN BYTE MODE.
+
+      IF lv_cc_owner IS INITIAL.
+        ls_cc_data-cc_owner = space.
+      ENDIF.
+
+      APPEND ls_cc_data TO et_ccdata.
+      CLEAR: ls_cc_data, lv_kostl.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~READ_ERROR_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_ERRORS                      TYPE        ZTT_IDC_HRDW_ERROR
+* | [<-->] CT_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~read_error_data.
+************************************************************************
+*  Method Name     :   READ_ERROR_DATA                                 *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+    DATA: lt_error_data TYPE STANDARD TABLE OF zfapt_hrdw_error,
+          lt_hrdw_data  TYPE ztt_cte_hrdwdata,
+          ls_hrdw_data  TYPE zctes_hrdwdata,
+          ls_errors_out TYPE zfapt_hrdw_error,
+          lo_strucdescr TYPE REF TO cl_abap_structdescr,
+          lt_hrdata_del TYPE ztt_cte_hrdwdata,
+          lrt_hrsrc     TYPE  /iwbep/t_cod_select_options,
+          ls_hrsrc      TYPE /iwbep/s_cod_select_option.
+
+* Fetch the Costcenter from FIORG mapping table
+
+    IF ct_hrdata IS NOT INITIAL.
+      SELECT * FROM zglt_fiorg_map INTO TABLE @DATA(lt_fiorg)
+        FOR ALL ENTRIES IN @ct_hrdata
+        WHERE cntry = @ct_hrdata-kostl+0(2)
+        AND   divsn = @ct_hrdata-spart+3(2)
+        AND   store = @ct_hrdata-schnum.
+*    ENDIF.    -- AD18112022 DR3K940450 If hr data is empty below logic should be skipped
+* Create range table for HR Source code
+      LOOP AT ct_hrdata ASSIGNING FIELD-SYMBOL(<lfs_hrdata>).
+        <lfs_hrdata>-hrsrc  = |{ <lfs_hrdata>-hrsrc ALPHA = IN }|.
+        TRY.
+            <lfs_hrdata>-kostl = lt_fiorg[ cntry = <lfs_hrdata>-kostl+0(2)
+                                            divsn = <lfs_hrdata>-spart+3(2)
+                                            store = <lfs_hrdata>-schnum ]-kostl.
+          CATCH cx_sy_itab_line_not_found.
+        ENDTRY.
+        ls_hrsrc-sign       = zif_ap_cte_constants=>gc_insert.
+        ls_hrsrc-option     = zif_ap_cte_constants=>gc_equal.
+        ls_hrsrc-low        = <lfs_hrdata>-hrsrc.
+        APPEND ls_hrsrc TO lrt_hrsrc.
+        CLEAR ls_hrsrc.
+      ENDLOOP.
+
+      SORT lrt_hrsrc BY low.
+      DELETE ADJACENT DUPLICATES FROM lrt_hrsrc COMPARING low.
+
+* Select data from error table which are ready for reprocessing.
+      SELECT * FROM zfapt_hrdw_error
+        INTO TABLE lt_error_data FOR ALL ENTRIES IN ct_hrdata
+        WHERE awinno = ct_hrdata-awinno+0(9) OR  ( reproc = abap_true AND hrsrc IN lrt_hrsrc ).
+      IF sy-subrc = 0.
+
+* Check for changes and update error records accordingly
+        LOOP AT lt_error_data ASSIGNING FIELD-SYMBOL(<fs_error_data>).
+          TRY.
+              ASSIGN ct_hrdata[ awinno = <fs_error_data>-awinno ] TO FIELD-SYMBOL(<fs_hrdw_data>).
+              IF sy-subrc = 0.
+*check and move error data to file data to have the latest data for processing
+
+                IF <fs_hrdw_data>-regio IS INITIAL.
+                  <fs_hrdw_data>-regio  = <fs_error_data>-regio.
+                ENDIF.
+                IF <fs_hrdw_data>-auserid IS INITIAL.
+                  <fs_hrdw_data>-auserid  = <fs_error_data>-ausrid.
+                ENDIF.
+
+                IF <fs_hrdw_data>-intca IS INITIAL.
+                  <fs_hrdw_data>-intca  = <fs_error_data>-intca.
+                ENDIF.
+                IF <fs_hrdw_data>-spart IS INITIAL.
+                  <fs_hrdw_data>-spart  = <fs_error_data>-spart.
+                ENDIF.
+
+                IF <fs_hrdw_data>-schnum IS INITIAL.
+                  <fs_hrdw_data>-schnum  = <fs_error_data>-schnum.
+                ENDIF.
+                IF <fs_hrdw_data>-paytyp IS INITIAL.
+                  <fs_hrdw_data>-paytyp = <fs_error_data>-ptype.
+                ENDIF.
+                IF <fs_hrdw_data>-swinno IS INITIAL.
+                  <fs_hrdw_data>-swinno  = <fs_error_data>-swinno.
+                ENDIF.
+                IF <fs_hrdw_data>-nachn IS INITIAL.
+                  <fs_hrdw_data>-nachn  = <fs_error_data>-nachn.
+                ENDIF.
+                IF <fs_hrdw_data>-vorna IS INITIAL.
+                  <fs_hrdw_data>-vorna  = <fs_error_data>-vorna.
+                ENDIF.
+                IF <fs_hrdw_data>-midnm IS INITIAL.
+                  <fs_hrdw_data>-midnm  = <fs_error_data>-midnm.
+                ENDIF.
+                IF <fs_hrdw_data>-paybnd IS INITIAL.
+                  <fs_hrdw_data>-paybnd  = <fs_error_data>-paybnd.
+                ENDIF.
+                IF <fs_hrdw_data>-saind IS INITIAL.
+                  <fs_hrdw_data>-saind  = <fs_error_data>-saind.
+                ENDIF.
+                IF <fs_hrdw_data>-jclass IS INITIAL.
+                  <fs_hrdw_data>-jclass  = <fs_error_data>-jclass.
+                ENDIF.
+                IF <fs_hrdw_data>-lgort IS INITIAL.
+                  <fs_hrdw_data>-lgort  = <fs_error_data>-lgort.
+                ENDIF.
+                IF <fs_hrdw_data>-jcode IS INITIAL.
+                  <fs_hrdw_data>-jcode  = <fs_error_data>-jcode.
+                ENDIF.
+                IF <fs_hrdw_data>-locat IS INITIAL.
+                  <fs_hrdw_data>-locat  = <fs_error_data>-locat.
+                ENDIF.
+                IF <fs_hrdw_data>-ort01 IS INITIAL.
+                  <fs_hrdw_data>-ort01  = <fs_error_data>-ort01.
+                ENDIF.
+                IF <fs_hrdw_data>-state IS INITIAL.
+                  <fs_hrdw_data>-state  = <fs_error_data>-state.
+                ENDIF.
+                IF <fs_hrdw_data>-land1 IS INITIAL.
+                  <fs_hrdw_data>-land1  = <fs_error_data>-land1.
+                ENDIF.
+                IF <fs_hrdw_data>-pstlz IS INITIAL.
+                  <fs_hrdw_data>-pstlz  = <fs_error_data>-pstlz.
+                ENDIF.
+                IF <fs_hrdw_data>-hrsrc IS NOT INITIAL.
+                  <fs_hrdw_data>-hrsrc = |{ <fs_hrdw_data>-hrsrc ALPHA = IN }|.
+                ENDIF.
+*if indicator in error is Insert
+                IF <fs_error_data>-opera = 'I' .
+                  "For change and rehire carry insert flag
+                  IF  <fs_hrdw_data>-opera = 'C' OR <fs_hrdw_data>-opera = 'R'.
+                    <fs_hrdw_data>-opera = 'I'.
+*for delete as the user is never processod to concur remove from HRDATA and delete from error table
+                  ELSEIF <fs_hrdw_data>-opera = 'D'.
+                    APPEND <fs_hrdw_data> TO lt_hrdata_del.
+                  ENDIF.
+                ENDIF.
+
+                ls_errors_out = CORRESPONDING #( <fs_hrdw_data> ).
+              ENDIF.
+            CATCH cx_sy_itab_line_not_found.
+              ls_hrdw_data = CORRESPONDING #( <fs_error_data> ).
+              APPEND ls_hrdw_data TO ct_hrdata.
+              ls_errors_out = CORRESPONDING #( <fs_error_data> ).
+
+          ENDTRY.
+
+          APPEND ls_errors_out TO et_errors.
+          CLEAR: ls_hrdw_data, ls_errors_out.
+        ENDLOOP.
+      ENDIF.
+
+* Begin of Ins AD18112022 DR3K940450 GT_errors_db is further used for error consolidation
+      IF et_errors IS NOT INITIAL.
+        me->gt_errors_db = et_errors.
+      ENDIF.
+* End of Ins AD18112022 DR3K940450
+
+*remove the insert(Error) , delete(File) combo records from processing
+      LOOP AT lt_hrdata_del INTO DATA(ls_del).
+        DELETE ct_hrdata WHERE awinno = ls_del-awinno.
+        CLEAR : ls_del.
+      ENDLOOP.
+
+    ENDIF. " ++ AD18112022 DR3K940450 Above logic is skipped if hrdata is initial
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~READ_HR_FILE_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_IPATH                       TYPE        FILEINTERN
+* | [--->] IV_BPATH                       TYPE        FILEINTERN
+* | [<---] ET_HRDATA                      TYPE        ZTT_HRDW_AZURE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~read_hr_file_data.
+************************************************************************
+*  Method Name     :   READ_HR_FILE_DATA                               *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date       Request      Description                      *
+
+*----------------------------------------------------------------------*
+
+    CLEAR: gt_filelist, gv_file_path.
+
+* Validate file path
+    CALL METHOD me->validate_input_file
+      EXPORTING
+        iv_ipath = iv_ipath. " errors
+
+    CHECK gt_filelist IS NOT INITIAL.
+    CHECK gv_file_path IS NOT INITIAL.
+*
+* Read file data
+    CALL METHOD me->read_input_file
+      IMPORTING
+        et_file_data = et_hrdata.
+
+
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~READ_INPUT_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [<---] ET_FILE_DATA                   TYPE        TABLE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~read_input_file.
+************************************************************************
+*  Method Name     :   READ_INPUT_FILE_605                             *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Processing hrdw data to be sent to concur IN    *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+
+    DATA: lv_filename TYPE string,
+          ls_filelist TYPE eps2fili.
+
+
+* File list internal table will have one record only.
+    TRY.
+        ls_filelist = gt_filelist[ 1 ].
+        lv_filename = |{ gv_file_path }{ ls_filelist-name }|.
+
+        CALL FUNCTION 'Z_WM_UPLOAD_FILE'
+          EXPORTING
+            iv_file_name     = lv_filename
+            iv_separator     = gc_pipe
+            iv_location      = gc_a
+          CHANGING
+            ct_tab_data      = et_file_data
+          EXCEPTIONS
+            file_open_error  = 1
+            file_close_error = 2
+            OTHERS           = 3.
+        IF sy-subrc <> 0.
+          MESSAGE ID sy-msgid TYPE sy-msgty NUMBER sy-msgno WITH sy-msgv1 sy-msgv2 sy-msgv3 sy-msgv4.
+        ELSE.
+          DELETE et_file_data INDEX 1.
+        ENDIF.
+      CATCH cx_sy_itab_line_not_found.
+
+    ENDTRY.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~UPDATE_CC_DB
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_BPATH                       TYPE        FILEINTERN(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~update_cc_db.
+*update the users table
+    IF gt_cc_data IS NOT INITIAL.
+
+      " Fetch existing data for update
+      SELECT kostl,created_on,created_by FROM zapt_con_cc_hrdw
+        INTO TABLE @DATA(lt_cc_hrdw)
+        FOR ALL ENTRIES IN @gt_cc_data
+        WHERE kostl = @gt_cc_data-kostl.
+      IF sy-subrc EQ 0.
+        SORT lt_cc_hrdw BY kostl.
+      ENDIF.
+
+      " Update Creation & Update Date,user
+      LOOP AT gt_cc_data ASSIGNING FIELD-SYMBOL(<ls_cc_data>).
+
+******Update change log fields
+        READ TABLE lt_cc_hrdw INTO DATA(ls_cc_hrdw)
+        WITH KEY kostl = <ls_cc_data>-kostl BINARY SEARCH.
+        IF sy-subrc EQ 0.
+          <ls_cc_data>-created_on = ls_cc_hrdw-created_on.
+          <ls_cc_data>-created_by = ls_cc_hrdw-created_by.
+        ELSE.
+          <ls_cc_data>-created_on = sy-datum.
+          <ls_cc_data>-created_by = sy-uname.
+        ENDIF.
+        <ls_cc_data>-changed_on = sy-datum.
+        <ls_cc_data>-changed_by = sy-uname.
+
+      ENDLOOP.
+
+*      *Safe guard.If the table is locked by somebody, this loop will try 5 times at 2 seconds intervals
+
+      CALL METHOD me->zfapif_hr_master_data_concur~update_ddic_table
+        EXPORTING
+          iv_table_name = gc_apt_con_cc_tab        " Table Name
+          it_data       = gt_cc_data
+          iv_operation  = gc_m
+        IMPORTING
+          ev_error      = DATA(lv_error).                 " Message Text
+      " Update data into Database Table
+      IF lv_error IS INITIAL.
+
+* Write Input file to Backup file folder and set the file as processed
+        CALL METHOD me->zfapif_hr_master_data_concur~backup_input_file
+          EXPORTING
+            iv_bpath = iv_bpath.
+        COMMIT WORK.
+
+      ENDIF.
+
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~UPDATE_DB
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_BPATH                       TYPE        FILEINTERN(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~update_db.
+************************************************************************
+*  Method Name     :   UPDATE_DB                                       *
+*  Object ID       :   I01289                                          *
+*  Title           :   process HRDW data for concur                    *
+*  Author          :   Hari Chaitanya                                  *
+*  Author of TS    :                                                   *
+*  Country         :                                                   *
+*  Creation Date   :                                                   *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Update the Database tables in SAP               *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request           Description                *
+
+*----------------------------------------------------------------------*
+* Write Input file to Backup file folder and set the file as processed
+    CALL METHOD me->backup_input_file
+      EXPORTING
+        iv_bpath = iv_bpath.
+
+
+    go_utility = zcl_ap_cte_utility=>get_instance( ).
+    IF gt_error_del IS NOT INITIAL.
+      go_utility->enqueue_dequeue(
+        EXPORTING
+          iv_table_name = zif_ap_cte_constants=>gc_cn_hrdw_errors
+          it_data       = gt_error_del
+          iv_operation  = zif_ap_cte_constants=>gc_d
+      ).
+    ENDIF.
+
+    IF gt_errors IS NOT INITIAL.
+      gt_error_upd = CORRESPONDING #( gt_errors ).
+      go_utility->enqueue_dequeue(
+        EXPORTING
+          iv_table_name = zif_ap_cte_constants=>gc_cn_hrdw_errors
+          it_data       = gt_error_upd
+          iv_operation  = zif_ap_cte_constants=>gc_modify
+      ).
+
+    ENDIF.
+
+*update the users table
+    IF gt_user_upd IS NOT INITIAL.
+      go_utility->enqueue_dequeue(
+        EXPORTING
+          iv_table_name = zif_ap_cte_constants=>gc_cn_cte_users
+          it_data       = gt_user_upd
+          iv_operation  = zif_ap_cte_constants=>gc_modify
+      ).
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~UPDATE_DDIC_TABLE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_TABLE_NAME                  TYPE        TABNAME
+* | [--->] IT_DATA                        TYPE        ANY TABLE
+* | [--->] IV_OPERATION                   TYPE        CHAR1
+* | [<---] EV_ERROR                       TYPE        BAPI_MSG
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~update_ddic_table.
+************************************************************************
+*  Method Name     :   UPDATE_DDIC_TABLE                               *
+*  Object ID       :   I01289                                          *
+*  Title           :   Execute process for Cost center owner & tech    *
+*                      org file to store in staging table              *
+*  Author          :   Venkatesh Pelli                                 *
+*  Country         :   IN                                              *
+*  Creation Date   :   12-Sep-2022                                     *
+*  Description     :   Update DB table                                 *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request      Description                     *
+* VN532TM     09/12/2022  DR3K938940  Initial                          *
+*----------------------------------------------------------------------*
+
+* Data declaration
+    DATA: lo_table        TYPE REF TO data.
+
+* Field Symbol
+    FIELD-SYMBOLS: <lt_table> TYPE table.
+
+* Create reference of table given
+    CREATE DATA lo_table TYPE TABLE OF (iv_table_name).
+    ASSIGN lo_table->* TO <lt_table>.
+
+    MOVE-CORRESPONDING it_data TO <lt_table>.
+
+    IF iv_table_name IS NOT INITIAL.
+
+*Safe guard.If the table is locked by somebody, this loop will try 5 times at 2 seconds intervals
+      CALL FUNCTION 'ENQUEUE_E_TABLE'
+        EXPORTING
+          mode_rstable   = zfapif_hr_master_data_concur=>gc_e "'E'
+          tabname        = iv_table_name
+          _scope         = '2'
+*         _wait          = '5'
+        EXCEPTIONS
+          foreign_lock   = 1
+          system_failure = 2
+          OTHERS         = 3.
+      IF sy-subrc IS INITIAL.
+
+* Check if the operation is to modify
+        IF iv_operation EQ zfapif_hr_master_data_concur=>gc_m."M Modify
+
+          DO 3 TIMES.
+            MODIFY (iv_table_name) FROM TABLE <lt_table>.
+            IF sy-subrc EQ 0.
+              EXIT.
+            ENDIF.
+          ENDDO.
+        ELSEIF iv_operation EQ zfapif_hr_master_data_concur=>gc_d. "D Delete
+
+          DELETE (iv_table_name) FROM TABLE <lt_table>.
+        ENDIF.
+
+        " Should not be commited here as when caller is trying to update multiple tables
+        " Issue might raised in other tab and roll back might be needed
+        IF sy-subrc IS INITIAL.
+*          COMMIT WORK.
+        ENDIF.
+
+* Unlock the table
+        CALL FUNCTION 'DEQUEUE_E_TABLE'
+          EXPORTING
+            mode_rstable = zfapif_hr_master_data_concur=>gc_e "'E'
+            tabname      = iv_table_name.
+
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZFAPCL_HR_MASTER_DATA_CONCUR->ZFAPIF_HR_MASTER_DATA_CONCUR~VALIDATE_INPUT_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_IPATH                       TYPE        FILEINTERN
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD zfapif_hr_master_data_concur~validate_input_file.
+************************************************************************
+*  Method Name     :   VALIDATE_INPUT_FILE                             *
+*  Object ID       :   I01289                                         *
+*  Title           :                                                   *
+*  Author          :   Venkatesh Pelli                                 *
+*  Author of TS    :                                                   *
+*  Country         :   IN                                              *
+*  Creation Date   :   08/26/2022                                      *
+*  Logical DB      :   None                                            *
+*  Reference       :   None                                            *
+*  Scheduling      :   On Demand                                       *
+*  Description     :   Validating input files from HRDW                *
+*----------------------------------------------------------------------*
+* Modifications                                                        *
+* User ID     Date        Request     Description                      *
+*                                                                      *
+*----------------------------------------------------------------------*
+
+    DATA: lv_dirname      TYPE eps2filnam,
+          lt_filelist     TYPE STANDARD TABLE OF eps2fili,
+          lt_filelist_trg TYPE STANDARD TABLE OF epsfili,
+          ls_filelist     TYPE eps2fili,
+          lv_file_count   TYPE i,
+          lv_filename     TYPE string,
+          lv_filename_txt TYPE string,
+          lv_filename_trg TYPE epsfilnam,
+          lv_txt          TYPE char4,
+          lv_dot          TYPE char1 VALUE '.'.
+
+    DATA: lv_dummy TYPE char3 VALUE 'any',   "Dummy filename
+          lv_len   TYPE i.
+
+    CALL FUNCTION 'FILE_GET_NAME_USING_PATH'
+      EXPORTING
+        client                     = sy-mandt
+        logical_path               = iv_ipath
+        operating_system           = sy-opsys
+        file_name                  = lv_dummy
+      IMPORTING
+        file_name_with_path        = gv_file_path
+      EXCEPTIONS
+        path_not_found             = 1
+        missing_parameter          = 2
+        operating_system_not_found = 3
+        file_system_not_found      = 4
+        OTHERS                     = 5.
+
+    IF sy-subrc EQ 0.
+*&  Remove dummy file name from the physical path
+      lv_len = strlen( gv_file_path ).
+      lv_len = lv_len - 3.
+      gv_file_path = gv_file_path+0(lv_len).
+    ELSE.
+      CLEAR gv_file_path.
+    ENDIF.
+
+
+    IF gv_file_path IS INITIAL.
+      MESSAGE e999(zfap_cte) WITH 'Invalid source file Path'(017).
+    ELSE.
+      lv_dirname = gv_file_path+0(lv_len).
+
+* Get all files from input file
+      CALL FUNCTION 'EPS2_GET_DIRECTORY_LISTING'
+        EXPORTING
+          iv_dir_name            = lv_dirname
+        TABLES
+          dir_list               = lt_filelist
+        EXCEPTIONS
+          invalid_eps_subdir     = 1
+          sapgparam_failed       = 2
+          build_directory_failed = 3
+          no_authorization       = 4
+          read_directory_failed  = 5
+          too_many_read_errors   = 6
+          empty_directory_list   = 7
+          OTHERS                 = 8.
+      IF sy-subrc <> 0.
+* Implement suitable error handling here
+        IF lt_filelist IS INITIAL.
+          MESSAGE i999(zfap_cte) WITH 'Input File is not available in Appplication Server File Folder'(018).
+         LEAVE TO LIST-PROCESSING.
+        ENDIF.
+      ELSE.
+        DELETE lt_filelist WHERE size EQ 0.
+* Move the files to temporary internal table
+
+        DELETE lt_filelist WHERE name NS gc_csv.
+
+        lv_file_count = lines( lt_filelist ).
+
+      ENDIF.
+
+      IF lv_file_count > 1.
+* Throw error message and stop processing the program
+* Error Message: Multiple Files are in File Folder.
+        MESSAGE e999(zfap_cte) WITH 'Multiple Files are in file folder'(019).
+      ELSE.
+        gt_filelist = lt_filelist.
+      ENDIF.
+
+* Validate the Input file
+
+      LOOP AT lt_filelist INTO ls_filelist.
+
+        CLEAR lv_filename .
+        lv_filename =  |{ gv_file_path }{ ls_filelist-name }| .
+
+        CALL FUNCTION 'Z_WM_VALIDATE_FILE_LOCATION'
+          EXPORTING
+            iv_name                   = lv_filename
+            iv_type                   = 'F'
+            iv_source                 = gc_a
+          EXCEPTIONS
+            file_open_error           = 1
+            authorization_error       = 2
+            file_name_empty           = 3
+            invalid_folder            = 4
+            no_write_access_to_folder = 5
+            OTHERS                    = 6.
+        IF sy-subrc <> 0.
+          MESSAGE e999(zfap_cte) WITH 'Invalid File Name'(021).
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+  ENDMETHOD.
+ENDCLASS.
