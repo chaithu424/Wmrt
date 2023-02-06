@@ -1,0 +1,1632 @@
+class ZCL_AP_CTE_UTILITY definition
+  public
+  final
+  create public .
+
+public section.
+
+  interfaces ZIF_AP_CTE_CONSTANTS .
+
+  constants GC_X type CHAR1 value 'X' ##NO_TEXT.
+  constants GC_S type CHAR1 value 'S' ##NO_TEXT.
+  constants GC_CN_COMPANY_CODE type BUKRS value 'CN001' ##NO_TEXT.
+
+  class-methods GET_INSTANCE
+    returning
+      value(RO_CONCUR_UTIL) type ref to ZCL_AP_CTE_UTILITY .
+  methods MAINTAIN_VENDORS
+    importing
+      !IS_VMDS_EXTERN type VMDS_EI_MAIN
+      !IV_TEST_RUN type XFELD default ' '
+      !IS_CONTEXT type ZAPT_CTE_MARKET
+      !IS_VMDS_ERROR type VMDS_EI_MAIN optional
+    exporting
+      !ES_VMDS_SUCC type VMDS_EI_MAIN
+      !ES_VMDS_ERROR type VMDS_EI_MAIN .
+  methods CREATE_CONC_FILES
+    importing
+      !IT_DATA type ZAPT_CTE_SOURCE_DATA_T
+      !IS_ERROR type VMDS_EI_MAIN optional
+      !IS_SUCCESS type VMDS_EI_MAIN optional
+      !IS_CONTEXT type ZAPT_CTE_MARKET
+      !IV_TESTFILEPATH type ANY optional
+      !IV_INITIAL_RUN type CHAR01 optional
+    exporting
+      !EV_ERROR type STRING
+      !ET_SUCCESS_DATA type ref to DATA
+      !ET_ERROR_DATA type ref to DATA
+      !ET_ERROR_MSGS type STRING_TABLE
+    raising
+      CX_STATIC_CHECK .
+  methods GET_HEADER
+    importing
+      !IS_FILE_INFO type ZAPT_CTE_FILES
+    exporting
+      !EV_VALUE type STRING .
+  methods SET_ERR_LOG
+    importing
+      !IT_ERR_MSGS type BAPIRET2_T optional
+      !IT_SOURCE_IDS type ANY optional
+      !IT_EMPIDS type ANY optional
+      !IT_OBJECTIDS type ANY optional
+      !IV_REGION type ZAPF_REGION optional
+      !IV_CNTRY type T005T-LAND1 optional .
+  methods ADD_ERROR_MSG
+    importing
+      !IV_MSGTYPE type BAPI_MTYPE optional
+      !IV_MSGCLASS type SYMSGID optional
+      !IV_MSGNUMBER type SYMSGNO optional
+      !IV_MSG_V1 type ANY optional
+      !IV_MSG_V2 type ANY optional
+      !IV_MSG_V3 type ANY optional
+      !IV_MSG_V4 type ANY optional
+      !IV_MESSAGE type STRING optional
+      !IV_ADD_TO_DB_TAB type CHAR01 optional
+      !IV_EMPID type ANY optional
+      !IS_CONTEXT type ZAPT_CTE_MARKET optional .
+  methods RETURN_MSGS
+    changing
+      !CT_DISPLAY_MSGS type ZAPT_CTE_INFOTAB_T optional
+      !CT_LOG_MSGS type BAPIRET2_T optional .
+  methods CLEANUP
+    importing
+      !IV_CLEAR_LOG type CHAR01 optional
+      !IV_CLEAR_DISPLAY_MSGS type CHAR01 optional .
+  methods WRITE_TO_APP_LOG
+    importing
+      !FI_OBJECT type BALOBJ_D
+      !FI_SUBOBJECT type BALSUBOBJ
+      !FT_MESSAGES type BAPIRET2_T .
+  methods FORMAT_COST_CENTERS
+    importing
+      !IT_FILE_DATA type /SAPPCE/TTORG_CSKS
+    exporting
+      !ET_FILE_DATA type ZAPS_CTE_CC_CTRY_T .
+  methods ENQUEUE_DEQUEUE
+    importing
+      !IV_TABLE_NAME type STRING
+      !IT_DATA type ANY TABLE optional
+      !IV_OPERATION type CHAR01 optional
+      !IV_EMPLOYEE_GROUP type STRING optional .
+  methods SET_ERR_LOG_CN
+    importing
+      !IT_ERR_MSGS type BAPIRET2_T
+      !IV_REGION type ZAPF_REGION
+      !IV_CNTRY type T005T-LAND1
+      !IV_SOURCE_ID type ANY .
+  methods READ_DATA_FROM_SRC_FILE
+    importing
+      !IV_IPATH type EPSDIRNAM
+      !IV_FILENAME type EPSFILNAM
+    exporting
+      !ET_DATA type DATA .
+  PROTECTED SECTION.
+private section.
+
+  aliases GC_ACTION_SUB
+    for ZIF_AP_CTE_CONSTANTS~GC_ACTION_SUB .
+  aliases GC_APP_LOG_OBJECT
+    for ZIF_AP_CTE_CONSTANTS~GC_APP_LOG_OBJECT .
+  aliases GC_APP_LOG_SUBOBJECT
+    for ZIF_AP_CTE_CONSTANTS~GC_APP_LOG_SUBOBJECT .
+  aliases GC_BR
+    for ZIF_AP_CTE_CONSTANTS~GC_BR .
+  aliases GC_CONC_FILE_CRT_FAIL
+    for ZIF_AP_CTE_CONSTANTS~GC_CONC_FILE_CRT_FAIL .
+  aliases GC_ERROR_MSG_TYPE
+    for ZIF_AP_CTE_CONSTANTS~GC_ERROR_MSG_TYPE .
+  aliases GC_HR_DIRECTOR
+    for ZIF_AP_CTE_CONSTANTS~GC_HR_DIRECTOR .
+  aliases GC_HR_MANAGER
+    for ZIF_AP_CTE_CONSTANTS~GC_HR_MANAGER .
+  aliases GC_INFO_MSG_TYPE
+    for ZIF_AP_CTE_CONSTANTS~GC_INFO_MSG_TYPE .
+  aliases GC_INSERT
+    for ZIF_AP_CTE_CONSTANTS~GC_INSERT .
+  aliases GC_LANGUAGE
+    for ZIF_AP_CTE_CONSTANTS~GC_LANGUAGE .
+  aliases GC_MSG_CLASS_CTE
+    for ZIF_AP_CTE_CONSTANTS~GC_MSG_CLASS_CTE .
+  aliases GC_MSG_NO_024
+    for ZIF_AP_CTE_CONSTANTS~GC_MSG_NO_024 .
+  aliases GC_MSG_NO_025
+    for ZIF_AP_CTE_CONSTANTS~GC_MSG_NO_025 .
+  aliases GC_MSG_NO_026
+    for ZIF_AP_CTE_CONSTANTS~GC_MSG_NO_026 .
+  aliases GC_MSG_NO_027
+    for ZIF_AP_CTE_CONSTANTS~GC_MSG_NO_027 .
+  aliases GC_OBJECT_TEXT
+    for ZIF_AP_CTE_CONSTANTS~GC_OBJECT_TEXT .
+  aliases GC_TEXT_ID_ST
+    for ZIF_AP_CTE_CONSTANTS~GC_TEXT_ID_ST .
+  aliases GC_UPDATE
+    for ZIF_AP_CTE_CONSTANTS~GC_UPDATE .
+  aliases GC_WARNING_MSG_TYPE
+    for ZIF_AP_CTE_CONSTANTS~GC_WARNING_MSG_TYPE .
+
+  data GT_LOG_MSGS type BAPIRET2_T .
+  data GT_DISPLAY_MSGS type ZAPT_CTE_INFOTAB_T .
+  class-data GO_CONCUR_UTIL type ref to ZCL_AP_CTE_UTILITY .
+  constants GC_MSG_CLASS type ARBGB value 'ZFAP_CTE' ##NO_TEXT.
+  constants MV_ERROR type CHAR1 value 'E' ##NO_TEXT.
+
+  methods SET_ERR_DISPLAY_MSGS
+    importing
+      !IS_VENDORS_EXTERN type VMDS_EI_MAIN
+      !IS_VENDOR type VMDS_EI_MAIN
+      !IS_CONTEXT type ZAPT_CTE_MARKET
+      !IV_TEST_RUN type ANY optional
+      !IS_ERR_MESSAGES type CVIS_MESSAGE .
+  methods SET_SUCCESS_DISPLAY_MSGS
+    importing
+      !IT_VENDORS type VMDS_EI_EXTERN_T
+      !IV_TEST_RUN type ANY optional .
+  methods SET_PARAMETERS
+    importing
+      !IV_CNTRY type LAND1
+    changing
+      !CT_VENDORS type VMDS_EI_EXTERN_T .
+  methods HANDLE_BANK_DATA
+    importing
+      !IS_VENDOR_MASTER type LFA1
+    changing
+      !CT_BANK_RECORDS type CVIS_EI_BANKDETAIL_T .
+  methods CREATE_TRG_FILE
+    importing
+      !IV_FILEPATH type ANY
+      !EV_ERROR type STRING optional .
+ENDCLASS.
+
+
+
+CLASS ZCL_AP_CTE_UTILITY IMPLEMENTATION.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->ADD_ERROR_MSG
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_MSGTYPE                     TYPE        BAPI_MTYPE(optional)
+* | [--->] IV_MSGCLASS                    TYPE        SYMSGID(optional)
+* | [--->] IV_MSGNUMBER                   TYPE        SYMSGNO(optional)
+* | [--->] IV_MSG_V1                      TYPE        ANY(optional)
+* | [--->] IV_MSG_V2                      TYPE        ANY(optional)
+* | [--->] IV_MSG_V3                      TYPE        ANY(optional)
+* | [--->] IV_MSG_V4                      TYPE        ANY(optional)
+* | [--->] IV_MESSAGE                     TYPE        STRING(optional)
+* | [--->] IV_ADD_TO_DB_TAB               TYPE        CHAR01(optional)
+* | [--->] IV_EMPID                       TYPE        ANY(optional)
+* | [--->] IS_CONTEXT                     TYPE        ZAPT_CTE_MARKET(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD add_error_msg.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Add msgs to error log                                *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 02/18/2019                                           *
+** Description   : Append msgs to the global table which is shown in    *
+*                   application log                                     *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    DATA: ls_msg     TYPE bapiret2,
+          lv_msg     TYPE string,
+          ls_err_tab TYPE zapt_cte_err_tab.
+
+    ls_msg-type = iv_msgtype.
+    ls_msg-id = iv_msgclass.
+    ls_msg-number = iv_msgnumber.
+    ls_msg-message_v1 = iv_msg_v1.
+    ls_msg-message_v2 = iv_msg_v2.
+    ls_msg-message_v3 = iv_msg_v3.
+    ls_msg-message_v4 = iv_msg_v4.
+    ls_msg-message = iv_message.
+
+    APPEND ls_msg TO gt_log_msgs.
+    CLEAR ls_msg.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->CLEANUP
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CLEAR_LOG                   TYPE        CHAR01(optional)
+* | [--->] IV_CLEAR_DISPLAY_MSGS          TYPE        CHAR01(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD cleanup.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Cleanup the attibutes                                *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/28/2019                                           *
+** Description   : Method to Cleanup the attibutes                      *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    IF iv_clear_log IS INITIAL AND iv_clear_display_msgs IS INITIAL.
+      CLEAR:  gt_log_msgs, gt_display_msgs.
+    ELSE.
+      IF iv_clear_log IS NOT INITIAL.
+        CLEAR gt_log_msgs.
+      ENDIF.
+      IF iv_clear_display_msgs IS NOT INITIAL.
+        CLEAR gt_display_msgs.
+      ENDIF.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->CREATE_CONC_FILES
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_DATA                        TYPE        ZAPT_CTE_SOURCE_DATA_T
+* | [--->] IS_ERROR                       TYPE        VMDS_EI_MAIN(optional)
+* | [--->] IS_SUCCESS                     TYPE        VMDS_EI_MAIN(optional)
+* | [--->] IS_CONTEXT                     TYPE        ZAPT_CTE_MARKET
+* | [--->] IV_TESTFILEPATH                TYPE        ANY(optional)
+* | [--->] IV_INITIAL_RUN                 TYPE        CHAR01(optional)
+* | [<---] EV_ERROR                       TYPE        STRING
+* | [<---] ET_SUCCESS_DATA                TYPE REF TO DATA
+* | [<---] ET_ERROR_DATA                  TYPE REF TO DATA
+* | [<---] ET_ERROR_MSGS                  TYPE        STRING_TABLE
+* | [!CX!] CX_STATIC_CHECK
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD create_conc_files.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Create Concur files                                  *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/19/2019                                           *
+** Description   : Program to create the concur files for Concur        *
+**                 implementation                                       *
+*************************************************************************
+** Modifications                                                        *
+** a0g02c4    Charm:2000023859    Have the control on country key       *
+**----------------------------------------------------------------------*
+    FIELD-SYMBOLS : <lft_conc_success> TYPE STANDARD TABLE,
+                    <ft_ext_data>      TYPE STANDARD TABLE,
+                    <lt_conc>          TYPE STANDARD TABLE,
+                    <lt_conc_error>    TYPE STANDARD TABLE,
+                    <lt_header>        TYPE STANDARD TABLE,
+                    <lfs_ext_value>    TYPE any,
+                    <lfs_string>       TYPE any,
+                    <lfs_conc_value>   TYPE any.
+
+    DATA: lt_fldcat              TYPE            lvc_t_fcat,
+          ls_fldcat              TYPE            lvc_s_fcat,
+          lv_value               TYPE            string,
+          lv_error_flag          TYPE            boole_d,
+          lv_error               TYPE            string,
+          ls_file_info           TYPE            zapt_cte_files,
+          lv_err_conf_msgs       TYPE            string,
+          lv_err_source_msgs     TYPE            string,
+          lv_is_first_itertion   TYPE            boole_d,
+          ls_conc_error          TYPE REF TO     data,
+          new_line               TYPE REF TO     data,
+          ls_hdr                 TYPE REF TO     data,
+          lv_filepath            TYPE /irm/gfilepath,
+          ex_ref                 TYPE REF TO     cx_root,
+          handle                 TYPE REF TO     zbd_cte_process_file_data,
+          lt_files               TYPE TABLE OF   zapt_cte_files,
+          lt_map_conc            TYPE TABLE OF   zapt_cte_filemap,
+          lt_err_tab             TYPE TABLE OF   zapt_cte_err_tab,
+          lv_do_mandatory_checks TYPE boole,
+          lv_final_string        TYPE string,
+          ls_log_msgs            TYPE bapiret2,
+********************************************  SOC to make file type dynamic - DR3K933958 ***********************************
+          lv_file                TYPE string.
+********************************************  EOC to make file type dynamic - DR3K933958 ***********************************
+
+    CONSTANTS:
+      lc_txt         TYPE char4 VALUE '.txt',
+      lc_trg         TYPE char4 VALUE '.trg',
+      lc_and         TYPE char1 VALUE '&',
+      lc_under_score TYPE char1 VALUE '_',
+      lc_slash       TYPE char1 VALUE '/',
+      lc_intca       TYPE char30 VALUE 'Z_I01289_CTE_INTCA_FILESEQ'.
+
+    IF iv_testfilepath IS NOT INITIAL.
+      lv_filepath = iv_testfilepath.
+    ELSE.
+      lv_filepath = is_context-file_path.
+    ENDIF.
+
+    CONCATENATE sy-datum sy-uzeit INTO DATA(lv_timestamp).
+*Get name of the concur file to be created and placed on the server
+*    CONCATENATE  lv_filepath lc_slash is_context-file_name lc_under_score lv_timestamp lc_txt INTO DATA(lv_file).
+*    CONCATENATE  lv_filepath lc_slash is_context-file_name lc_under_score lv_timestamp lc_trg INTO DATA(lv_trg_file).
+
+* Select the files to be created
+    SELECT * FROM zapt_cte_files
+                 INTO TABLE lt_files
+                 WHERE app_id         = is_context-app_id
+                 AND   cntry          = is_context-cntry
+                 AND   region         = is_context-region
+                 AND   source_id      = is_context-source_id
+                 AND   object_id      = is_context-object_id.
+
+    READ TABLE lt_files INTO DATA(ls_file_type) INDEX 1.
+
+********************************************  SOC to make file type dynamic - DR3K933958 ***********************************
+*Get name of the concur file to be created and placed on the server
+    IF ls_file_type-ddic_struc_name IS INITIAL.
+      CONCATENATE  lv_filepath lc_slash is_context-file_name lc_under_score lv_timestamp lc_txt INTO lv_file.
+    ELSE.
+      CONCATENATE  lv_filepath lc_slash is_context-file_name lc_under_score lv_timestamp ls_file_type-ddic_struc_name INTO lv_file.
+    ENDIF.
+    CONCATENATE  lv_filepath lc_slash is_context-file_name lc_under_score lv_timestamp lc_trg INTO DATA(lv_trg_file).
+********************************************  EOC to make file type dynamic - DR3K933958 ***********************************
+
+
+** Begin of insert a0g02c4  DR3K921067>>
+** Get the tvarvc value for INTCA
+    SELECT SINGLE low FROM tvarvc INTO @DATA(lv_cntry)
+           WHERE name = @lc_intca.
+    IF is_context-cntry EQ lv_cntry.
+      SORT lt_files BY seqno ASCENDING.
+    ELSE.
+** End of insert  a0g02c4 DR3K921067
+*Header file should be at the top
+      SORT lt_files BY is_header_file DESCENDING file_type ASCENDING.
+    ENDIF.        "a0g02c4 DR3K921067+
+    IF sy-subrc = 0.
+      LOOP AT lt_files INTO ls_file_info.
+        IF ls_file_info-is_header_file = 'X'.
+*Get header file of this file type and append to the final file
+          get_header(
+                    EXPORTING
+                      is_file_info =    ls_file_info " Database table for concur files
+                    IMPORTING
+                      ev_value     =    DATA(lv_hdr)
+                  ).
+        ELSE.
+*Call Badi implementation of this particular file by passing the filter values
+          GET BADI handle
+            FILTERS
+              application = ls_file_info-app_id
+              country     = ls_file_info-cntry
+              region      = ls_file_info-region
+              object      = ls_file_info-object_id
+              source      = ls_file_info-source_id
+              file        = ls_file_info-file_type.
+
+          READ TABLE it_data INTO DATA(ls_data) WITH KEY key = ls_file_info-file_type.
+          IF sy-subrc NE 0.
+            CONTINUE.
+          ENDIF.
+          ASSIGN ls_data-content->* TO <ft_ext_data>.
+
+          CHECK <ft_ext_data> IS ASSIGNED.
+
+*Load the mapping table specific to this file
+          SELECT *
+            FROM zapt_cte_filemap
+            INTO CORRESPONDING FIELDS OF TABLE lt_map_conc
+            WHERE app_id    = ls_file_info-app_id
+            AND   cntry     = ls_file_info-cntry
+            AND   region    = ls_file_info-region
+            AND   object_id = ls_file_info-object_id
+            AND   source_id = ls_file_info-source_id
+            AND   file_type = ls_file_info-file_type.
+
+          IF lt_map_conc IS NOT INITIAL.
+
+            SORT lt_map_conc BY sl_no.
+
+            LOOP AT lt_map_conc ASSIGNING FIELD-SYMBOL(<lfs_map1>).
+              ls_fldcat-fieldname = <lfs_map1>-conc_field.
+              ls_fldcat-datatype  = <lfs_map1>-data_type.
+              ls_fldcat-inttype   = <lfs_map1>-inttype.
+              ls_fldcat-intlen    = <lfs_map1>-intlen.
+              APPEND ls_fldcat TO lt_fldcat.
+              CLEAR ls_fldcat.
+            ENDLOOP.
+
+*Create dynamic tables
+            CALL METHOD cl_alv_table_create=>create_dynamic_table
+              EXPORTING
+                it_fieldcatalog = lt_fldcat
+              IMPORTING
+                ep_table        = et_success_data.
+
+            CALL METHOD cl_alv_table_create=>create_dynamic_table
+              EXPORTING
+                it_fieldcatalog = lt_fldcat
+              IMPORTING
+                ep_table        = et_error_data.
+
+            ASSIGN et_success_data->* TO <lt_conc>.
+
+            CREATE DATA new_line LIKE LINE OF <lt_conc>.
+            ASSIGN new_line->* TO FIELD-SYMBOL(<lfs_conc>).
+
+            ASSIGN et_error_data->* TO <lt_conc_error>.
+            CREATE DATA ls_conc_error LIKE LINE OF <lt_conc_error>.
+            ASSIGN ls_conc_error->* TO FIELD-SYMBOL(<lfs_conc_error>).
+
+            SELECT * FROM zapt_cte_err_tab
+            WHERE object_id = @ls_file_info-object_id
+              AND cntry     = @ls_file_info-cntry         " a0g02c4+
+              AND source_id = @ls_file_info-source_id     " a0g02c4+
+            INTO CORRESPONDING FIELDS OF TABLE @lt_err_tab.
+
+* Map the HR Source sytem fields with concur fields
+
+            LOOP AT <ft_ext_data> ASSIGNING FIELD-SYMBOL(<lfs_ext>).
+
+*Check if this record is new or existing
+              IF iv_initial_run IS NOT INITIAL.
+                lv_do_mandatory_checks = 'X'.
+              ELSE.
+*Flag must be set to 'X' inside the respective implementation, if mandatory checks are needed
+                CALL BADI handle->if_perform_mandatory_checks
+                  EXPORTING
+                    is_record = <lfs_ext>
+                  CHANGING
+                    cv_is_new = lv_do_mandatory_checks.
+              ENDIF.
+
+              LOOP AT lt_map_conc ASSIGNING FIELD-SYMBOL(<lfs_map_conc>).
+                CHECK <lfs_map_conc> IS ASSIGNED.
+                CHECK <lfs_ext> IS ASSIGNED.
+                IF <lfs_map_conc>-ext_field IS NOT INITIAL.
+                  ASSIGN COMPONENT <lfs_map_conc>-ext_field OF STRUCTURE <lfs_ext> TO <lfs_ext_value>.
+                ELSE.
+                  UNASSIGN <lfs_ext_value>.
+                ENDIF.
+                IF <lfs_map_conc>-is_const = 'X'. " Check if field is constant in configuration
+                  IF <lfs_map_conc>-default_value IS INITIAL AND <lfs_map_conc>-is_mandatory EQ 'X' AND iv_initial_run = 'X'.
+                    lv_error_flag          = 'X'.
+                    MESSAGE ID gc_msg_class_cte TYPE 'E' NUMBER '015' INTO lv_err_conf_msgs.
+                    IF lv_error IS INITIAL.
+                      CONCATENATE <lfs_map_conc>-conc_field  lv_err_conf_msgs INTO lv_error SEPARATED BY  ' '. " Collect error messages
+                    ELSE.
+                      CONCATENATE  lv_error lc_and <lfs_map_conc>-conc_field  lv_err_conf_msgs INTO lv_error SEPARATED BY  ' '.
+                    ENDIF.
+                    CLEAR lv_err_conf_msgs.
+                  ELSE.
+                    ASSIGN COMPONENT <lfs_map_conc>-conc_field OF STRUCTURE <lfs_conc> TO <lfs_conc_value>.
+                    <lfs_conc_value> = <lfs_map_conc>-default_value.
+                    REPLACE ALL OCCURRENCES OF ',' IN <lfs_conc_value> WITH ''.
+                  ENDIF.
+                ELSE.
+                  CHECK <lfs_ext_value> IS ASSIGNED.
+                  IF <lfs_ext_value> IS INITIAL AND <lfs_map_conc>-is_mandatory EQ 'X' AND lv_do_mandatory_checks = 'X'.
+                    lv_error_flag    = 'X'.
+                    MESSAGE ID gc_msg_class_cte TYPE 'E' NUMBER '016' INTO lv_err_source_msgs.
+                    IF lv_error IS INITIAL.
+                      CONCATENATE <lfs_map_conc>-ext_field  lv_err_source_msgs INTO lv_error SEPARATED BY ' '  .
+                    ELSE.
+                      CONCATENATE lv_error  lc_and <lfs_map_conc>-ext_field  lv_err_source_msgs INTO lv_error SEPARATED BY ' '  .
+                    ENDIF.
+                    CLEAR lv_err_source_msgs.
+                  ELSE.
+                    ASSIGN COMPONENT <lfs_map_conc>-conc_field OF STRUCTURE <lfs_conc> TO <lfs_conc_value>.
+                    CHECK <lfs_ext_value> IS ASSIGNED.
+                    <lfs_conc_value> = <lfs_ext_value>.
+                    REPLACE ALL OCCURRENCES OF ',' IN <lfs_conc_value> WITH ''.
+                  ENDIF.
+                ENDIF.
+              ENDLOOP.
+
+*Check if a BAdI implementation exists for the given filter values
+              IF handle->imps IS NOT INITIAL.
+                CALL BADI handle->add_msgs
+                  EXPORTING
+                    iv_error      = lv_error
+                    iv_error_flag = lv_error_flag
+                    it_err_tab    = lt_err_tab
+                  CHANGING
+                    cs_file_data  = <lfs_conc>.
+              ENDIF.
+
+              IF lv_error_flag IS NOT INITIAL.
+                APPEND <lfs_conc> TO <lt_conc_error>.
+              ELSE.
+                APPEND <lfs_conc> TO <lt_conc>.
+              ENDIF.
+              CLEAR: lv_error_flag, lv_error, <lfs_conc>,lv_do_mandatory_checks.
+            ENDLOOP.
+
+
+            IF handle->imps IS NOT INITIAL. "If the implementation is available, then call it.
+* Adjust the values of some fields according to the file format. It may be different files, hence we call the corresponding Badi implementation to perform this task
+              CALL BADI handle->file_specific_data_changes
+                EXPORTING
+                  is_success_vendors = is_success
+                  is_error_vendors   = is_error
+                  iv_initial_load    = iv_initial_run
+                CHANGING
+                  ct_file_data       = <lt_conc>. " Info about the file to be constructed
+            ENDIF.
+
+            IF <lt_conc> IS NOT INITIAL.
+
+*If header file is defined, it should be written at the top
+              IF lv_hdr IS NOT INITIAL.
+                CONCATENATE lv_hdr cl_abap_char_utilities=>cr_lf INTO lv_final_string.
+                CLEAR lv_hdr.
+              ENDIF.
+
+*Write data to the string which in turn will be transferred to al11
+              LOOP AT <lt_conc> INTO <lfs_conc>.
+                LOOP AT lt_map_conc ASSIGNING FIELD-SYMBOL(<lfs_map>).
+                  ASSIGN COMPONENT <lfs_map>-conc_field OF STRUCTURE <lfs_conc> TO <lfs_string>.
+                  IF lv_value IS INITIAL AND lv_is_first_itertion NE 'X'.
+                    lv_value = <lfs_string>.
+                    lv_is_first_itertion = 'X'.
+                  ELSE.
+                    CONCATENATE lv_value <lfs_string> INTO lv_value SEPARATED BY ','.
+                  ENDIF.
+                ENDLOOP.
+                CONCATENATE lv_final_string lv_value cl_abap_char_utilities=>cr_lf INTO lv_final_string.
+                CLEAR: lv_value, lv_is_first_itertion.
+              ENDLOOP.
+
+            ENDIF.
+          ENDIF.
+        ENDIF.
+
+*Get msgs from the BAdI
+        CALL BADI handle->return_log_msgs
+          CHANGING
+            ct_log_msgs     = gt_log_msgs
+            ct_display_msgs = gt_display_msgs.
+
+        CLEAR: lt_fldcat,ls_data.
+
+      ENDLOOP.
+
+*--------------------------------------------------------------------*
+*Write data to the file
+      IF lv_final_string IS NOT INITIAL.
+        TRY.
+            OPEN DATASET lv_file FOR OUTPUT IN TEXT MODE ENCODING UTF-8 WITH BYTE-ORDER MARK IGNORING CONVERSION ERRORS.
+            TRANSFER lv_final_string TO lv_file.
+            CLOSE DATASET lv_file.
+            CLEAR lv_final_string.
+          CATCH  cx_root INTO ex_ref.
+            ev_error = ex_ref->get_text( ).
+            ls_log_msgs-message = ev_error.
+            ls_log_msgs-type = gc_error_msg_type.
+            ls_log_msgs-message_v1 = ls_file_info-file_type.
+            RETURN.
+        ENDTRY.
+        create_trg_file( iv_filepath = lv_trg_file ).
+      ENDIF.
+*--------------------------------------------------------------------*
+
+    ELSE.
+*If file type (to be created) is not maintained in the configuration, add this message to application log
+* Msg Text: No Concur file created for &1 &2 &3 due to missing config
+      add_error_msg(
+        EXPORTING
+          iv_msgtype   =    'I' " Message type: S Success, E Error, W Warning, I Info, A Abort
+          iv_msgclass  =    gc_msg_class_cte " Message Class
+          iv_msgnumber =    '019' " Message Number
+          iv_msg_v1    =     is_context-region " Message Variable
+          iv_msg_v2    =     is_context-source_id " Message Variable
+          iv_msg_v3    =     is_context-object_id " Message Variable
+      ).
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AP_CTE_UTILITY->CREATE_TRG_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_FILEPATH                    TYPE        ANY
+* | [--->] EV_ERROR                       TYPE        STRING(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD create_trg_file.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Create target file                                   *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/28/2019                                           *
+** Description   : Method to create target file                         *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    DATA: ex_ref  TYPE REF TO cx_root.
+
+    TRY.
+        OPEN DATASET iv_filepath FOR OUTPUT IN TEXT MODE ENCODING DEFAULT.
+      CATCH  cx_root INTO ex_ref.
+*        ls_log_msgs-message = ex_ref->get_text( ).
+*        ls_log_msgs-type = GC_ERROR_MSG_TYPE.
+*        ls_log_msgs-message_v1 = ls_file_info-file_type.
+        RETURN.
+    ENDTRY.
+
+    TRY.
+        CLOSE DATASET iv_filepath.
+      CATCH cx_sy_file_close INTO ex_ref.
+*        ls_log_msgs-message = ex_ref->get_text( ).
+*        ls_log_msgs-type = GC_ERROR_MSG_TYPE.
+*        ls_log_msgs-message_v1 = ls_file_info-file_type.
+        RETURN.
+    ENDTRY.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->ENQUEUE_DEQUEUE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_TABLE_NAME                  TYPE        STRING
+* | [--->] IT_DATA                        TYPE        ANY TABLE(optional)
+* | [--->] IV_OPERATION                   TYPE        CHAR01(optional)
+* | [--->] IV_EMPLOYEE_GROUP              TYPE        STRING(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD enqueue_dequeue.
+**************************************************************************
+*   Object ID     : I01217                                               *
+*   Title         : Lock the table to be modified                        *
+*   Author        : Karthik Bhat/Manan Singla                            *
+*   Country       : Global                                               *
+*   Creation Date : 01/28/2019                                           *
+*   Description   : Method to lock/unlock the objects for various        *
+*                    operations                                          *
+*  ***********************************************************************
+*   Modifications                                                        *
+*                                                                        *
+*  ----------------------------------------------------------------------*
+    DATA lv_tabname TYPE rstable-tabname.
+
+    IF iv_table_name IS NOT INITIAL.
+      lv_tabname = iv_table_name.
+*Safe guard.If the table is locked by somebody, this loop will try 5 times at 2 seconds intervals
+      CALL FUNCTION 'ENQUEUE_E_TABLE'
+        EXPORTING
+          mode_rstable   = 'E'
+          tabname        = lv_tabname
+          _scope         = '2'
+          _wait          = '5'
+        EXCEPTIONS
+          foreign_lock   = 1
+          system_failure = 2
+          OTHERS         = 3.
+
+      IF sy-subrc IS INITIAL.
+        IF iv_table_name = 'ZAPT_CTE_USER_ID'.
+          DATA lt_data TYPE TABLE OF zapt_cte_user_id.
+          lt_data = it_data.
+          IF iv_operation = 'M'.
+            MODIFY zapt_cte_user_id FROM TABLE lt_data.   "Modify table data.
+          ELSEIF iv_operation = 'X'.
+            DELETE FROM zapt_cte_user_id.    "Delete the entire data
+          ELSEIF iv_operation = 'D'.
+            DELETE zapt_cte_user_id FROM TABLE lt_data. "Delete specific records
+          ELSE.
+            MODIFY zapt_cte_user_id FROM TABLE lt_data.   "Modify table data.
+          ENDIF.
+        ELSEIF iv_table_name = 'ZAPT_CTE_ERR_TAB'.
+          DATA lt_data1 TYPE TABLE OF zapt_cte_err_tab.
+          lt_data1 = it_data.
+          IF iv_operation = 'M'.
+            MODIFY zapt_cte_err_tab FROM TABLE lt_data1.   "Modify table data.
+          ELSEIF iv_operation = 'X'.
+            DELETE FROM zapt_cte_err_tab.    "Delete the entire data
+          ELSEIF iv_operation = 'D'.
+            DELETE zapt_cte_err_tab FROM TABLE lt_data1. "Delete specific records
+          ELSE.
+            MODIFY zapt_cte_err_tab FROM TABLE lt_data1.   "Modify table data.
+          ENDIF.
+        ELSEIF iv_table_name = zif_ap_cte_constants=>gc_cn_stage_table_name.
+          DATA lt_stage TYPE TABLE OF zapt_cte_cc_md.
+          lt_stage = it_data.
+          IF iv_operation = 'M'.
+            MODIFY zapt_cte_cc_md FROM TABLE lt_stage.   "Modify table data.
+          ELSEIF iv_operation = 'X'.
+            DELETE FROM zapt_cte_cc_md WHERE employee_group = iv_employee_group.    "Delete the entire data
+          ELSEIF iv_operation = 'D'.
+            DELETE zapt_cte_cc_md FROM TABLE lt_stage. "Delete specific records
+          ENDIF.
+** Begin of insert A0G02C4
+        ELSEIF iv_table_name = zif_ap_cte_constants=>gc_cn_hrdw_errors.
+          DATA lt_stage_err TYPE TABLE OF zfapt_hrdw_error.
+          lt_stage_err = it_data.
+          IF iv_operation = zif_ap_cte_constants=>gc_modify.
+            MODIFY zfapt_hrdw_error FROM TABLE lt_stage_err.   "Modify table data.
+*          ELSEIF iv_operation = abap_true.
+*            DELETE FROM zfapt_hrdw_error.    "Delete the entire data
+          ELSEIF iv_operation = zif_ap_cte_constants=>gc_d.
+            DELETE zfapt_hrdw_error FROM TABLE lt_stage_err. "Delete specific records
+          ENDIF.
+        ELSEIF iv_table_name = zif_ap_cte_constants=>gc_cn_cte_users.
+          DATA lt_stage_users TYPE TABLE OF zfapt_cte_users.
+          lt_stage_users = it_data.
+          IF iv_operation = zif_ap_cte_constants=>gc_modify.
+            MODIFY zfapt_cte_users FROM TABLE lt_stage_users.   "Modify table data.
+*          ELSEIF iv_operation = abap_true.
+*            DELETE FROM zfapt_cte_users.    "Delete the entire data
+          ELSEIF iv_operation = zif_ap_cte_constants=>gc_d.
+            DELETE zfapt_cte_users FROM TABLE lt_stage_users. "Delete specific records
+          ENDIF.
+** End of insert A0G02C4
+* Begin of insert by kjb002l for TR DR3K924449 ******************************
+        ELSEIF iv_table_name = 'ZAPT_CTE_ARBA'.
+          DATA lt_cte_arba TYPE TABLE OF zapt_cte_arba.
+          lt_cte_arba = it_data.
+          IF iv_operation = zif_ap_cte_constants=>gc_modify.
+            MODIFY zapt_cte_arba FROM TABLE lt_cte_arba.
+          ENDIF.
+* End of insert by kjb002l for TR DR3K924449 *********************************
+
+* BOC changes for SailPoint :d0m02f5 25/03/2021
+        ELSEIF iv_table_name = zif_ap_cte_constants=>gc_slpt_tabnam.
+          DATA lt_sailpoint TYPE TABLE OF zfapt_cte_slpnt.
+*          lt_sailpoint[] = it_data[].
+
+          lt_sailpoint = CORRESPONDING #( BASE ( lt_sailpoint ) it_data ).
+          IF iv_operation EQ zif_ap_cte_constants=>gc_modify.
+
+            MODIFY zfapt_cte_slpnt FROM TABLE lt_sailpoint.  "Modify Table data
+
+          ELSEIF iv_operation = zif_ap_cte_constants=>gc_d.
+
+            DELETE zfapt_cte_slpnt FROM TABLE lt_sailpoint. "Delete Table data
+          ENDIF.
+* EOC changes for SailPoint :d0m02f5 25/03/2021
+
+* BOC store Concur data in Full Load Table :d0m02f5 01/04/2021
+        ELSEIF iv_table_name = zif_ap_cte_constants=>gc_hrdw_tabnam.
+          DATA: lt_hrdw_f TYPE TABLE OF zput_hrdw_data_f.
+
+          lt_hrdw_f = CORRESPONDING #( BASE ( lt_hrdw_f ) it_data ).
+
+          IF iv_operation EQ zif_ap_cte_constants=>gc_modify.
+
+            MODIFY zput_hrdw_data_f FROM TABLE lt_hrdw_f.  "Modify Table data
+          ENDIF.
+
+* EOC store Concur data in Full Load Table :d0m02f5 01/04/2021
+        ENDIF.
+        COMMIT WORK.
+
+        CALL FUNCTION 'DEQUEUE_E_TABLE'
+          EXPORTING
+            mode_rstable = 'E'
+            tabname      = lv_tabname.
+
+      ENDIF.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->FORMAT_COST_CENTERS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_FILE_DATA                   TYPE        /SAPPCE/TTORG_CSKS
+* | [<---] ET_FILE_DATA                   TYPE        ZAPS_CTE_CC_CTRY_T
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD format_cost_centers.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Format cost centers                                  *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 06/10/2019                                           *
+** Description   : Method to format cost centers                        *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+
+    DATA: ls_cc_ctry TYPE zaps_cte_cc_ctry.
+
+    DATA(lt_file_data) = it_file_data.
+    SORT lt_file_data BY kostl.
+    DELETE ADJACENT DUPLICATES FROM lt_file_data COMPARING kostl.
+
+    SELECT kostl,
+           bukrs
+      FROM csks
+      INTO TABLE @DATA(lt_costcenters)
+      FOR ALL ENTRIES IN @lt_file_data
+      WHERE kostl = @lt_file_data-kostl.
+
+    DATA(lt_filtered_cc) = lt_costcenters.
+    SORT lt_filtered_cc BY bukrs.
+    DELETE ADJACENT DUPLICATES FROM lt_filtered_cc COMPARING bukrs.
+
+    SELECT bukrs,
+           land1
+      FROM t001
+      INTO TABLE @DATA(lt_t001)
+      FOR ALL ENTRIES IN @lt_filtered_cc
+      WHERE bukrs = @lt_filtered_cc-bukrs.
+
+    LOOP AT lt_costcenters INTO DATA(ls_costcenters).
+      ls_cc_ctry-kostl = ls_costcenters-kostl.
+      ls_cc_ctry-bukrs = ls_costcenters-bukrs.
+      READ TABLE lt_t001 INTO DATA(ls_t001) WITH KEY bukrs = ls_cc_ctry-bukrs.
+      IF sy-subrc = 0.
+        ls_cc_ctry-land1 = ls_t001-land1.
+      ENDIF.
+      APPEND ls_cc_ctry TO et_file_data.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->GET_HEADER
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_FILE_INFO                   TYPE        ZAPT_CTE_FILES
+* | [<---] EV_VALUE                       TYPE        STRING
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_header.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Get Concur file header                               *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/28/2019                                           *
+** Description   : Method to get concur file header                     *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    DATA:   lt_map_conc TYPE TABLE OF zapt_cte_filemap,
+            new_line    TYPE REF TO data,
+            lv_value    TYPE string,
+            lt_fldcat   TYPE lvc_t_fcat,
+            ls_fldcat   TYPE lvc_s_fcat.
+
+    FIELD-SYMBOLS :    <lt_header_conc> TYPE STANDARD TABLE,
+                       <lfs_string>     TYPE any,
+                       <lfs_conc_value> TYPE any.
+
+    SELECT conc_field ext_field is_const default_value data_type inttype intlen sl_no
+    FROM zapt_cte_filemap
+    INTO CORRESPONDING FIELDS OF TABLE lt_map_conc
+    WHERE app_id = is_file_info-app_id AND cntry = is_file_info-cntry
+    AND region = is_file_info-region AND object_id = is_file_info-object_id
+    AND source_id = is_file_info-source_id
+    AND file_type = is_file_info-file_type.
+
+*We need the field values in a particular order for our Concur files, so sorting is done
+    SORT lt_map_conc BY sl_no.
+
+    LOOP AT lt_map_conc ASSIGNING FIELD-SYMBOL(<lfs_map1>).
+      ls_fldcat-fieldname = <lfs_map1>-conc_field.
+      ls_fldcat-datatype = <lfs_map1>-data_type.
+      ls_fldcat-inttype = <lfs_map1>-inttype.
+      ls_fldcat-intlen = <lfs_map1>-intlen.
+      APPEND ls_fldcat TO lt_fldcat.
+      CLEAR ls_fldcat.
+    ENDLOOP.
+
+    CALL METHOD cl_alv_table_create=>create_dynamic_table
+      EXPORTING
+        it_fieldcatalog = lt_fldcat
+      IMPORTING
+        ep_table        = DATA(lt_header).
+
+    ASSIGN lt_header->* TO <lt_header_conc>.
+
+    CREATE DATA new_line LIKE LINE OF <lt_header_conc>.
+
+    ASSIGN new_line->* TO FIELD-SYMBOL(<lfs_conc>).
+
+    LOOP AT lt_map_conc INTO DATA(ls_map_conc).
+      IF ls_map_conc-is_const = 'X'.
+        ASSIGN COMPONENT ls_map_conc-conc_field OF STRUCTURE <lfs_conc> TO <lfs_conc_value>.
+        <lfs_conc_value> = ls_map_conc-default_value.
+      ENDIF.
+    ENDLOOP.
+    APPEND <lfs_conc> TO <lt_header_conc>.
+    CLEAR <lfs_conc>.
+
+    LOOP AT <lt_header_conc> INTO <lfs_conc>.
+      LOOP AT lt_map_conc INTO ls_map_conc.
+        ASSIGN COMPONENT ls_map_conc-conc_field OF STRUCTURE <lfs_conc> TO <lfs_string>.
+        IF lv_value IS INITIAL.
+          lv_value = <lfs_string>.
+        ELSE.
+          CONCATENATE lv_value <lfs_string> INTO lv_value SEPARATED BY ','.
+        ENDIF.
+      ENDLOOP.
+
+    ENDLOOP.
+
+    ev_value = lv_value.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Static Public Method ZCL_AP_CTE_UTILITY=>GET_INSTANCE
+* +-------------------------------------------------------------------------------------------------+
+* | [<-()] RO_CONCUR_UTIL                 TYPE REF TO ZCL_AP_CTE_UTILITY
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD get_instance.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Get Instance of class                                *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/19/2019                                           *
+** Description   : Program to create d concur files for Concur          *
+**                 implementation                                       *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+
+    IF go_concur_util IS NOT BOUND.
+      CREATE OBJECT go_concur_util.
+    ENDIF.
+
+    ro_concur_util = go_concur_util.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AP_CTE_UTILITY->HANDLE_BANK_DATA
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_VENDOR_MASTER               TYPE        LFA1
+* | [<-->] CT_BANK_RECORDS                TYPE        CVIS_EI_BANKDETAIL_T
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD handle_bank_data.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Handle bank data                                     *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/28/2019                                           *
+** Description   : Method to check if bank details have to be updated   *
+**                 or created for the given vendor                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+
+    LOOP AT ct_bank_records ASSIGNING FIELD-SYMBOL(<fs_bank>).
+      IF <fs_bank> IS ASSIGNED." AND is_vendor_master is NOT INITIAL.
+        IF is_vendor_master-lifnr IS NOT INITIAL.
+          SELECT SINGLE * FROM lfbk INTO @DATA(ls_lfbk) WHERE lifnr = @is_vendor_master-lifnr AND banks = @<fs_bank>-data_key-banks
+                                                                AND bankn = @<fs_bank>-data_key-bankn AND bankl = @<fs_bank>-data_key-bankl.
+          IF sy-subrc = 0.
+            <fs_bank>-task = gc_update.
+          ELSE.
+            <fs_bank>-task = gc_insert.
+          ENDIF.
+        ELSE.
+          <fs_bank>-task = gc_insert.
+        ENDIF.
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->MAINTAIN_VENDORS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_VMDS_EXTERN                 TYPE        VMDS_EI_MAIN
+* | [--->] IV_TEST_RUN                    TYPE        XFELD (default =' ')
+* | [--->] IS_CONTEXT                     TYPE        ZAPT_CTE_MARKET
+* | [--->] IS_VMDS_ERROR                  TYPE        VMDS_EI_MAIN(optional)
+* | [<---] ES_VMDS_SUCC                   TYPE        VMDS_EI_MAIN
+* | [<---] ES_VMDS_ERROR                  TYPE        VMDS_EI_MAIN
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD maintain_vendors.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Maintain Vendors                                     *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/19/2019                                           *
+** Description   : Method to create or update vendors                   *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+
+    DATA : ls_vmds    TYPE vmds_ei_main.
+
+    IF is_vmds_extern-vendors IS NOT INITIAL.
+
+      vmd_ei_api=>initialize( ).
+
+*  Call the Method for creation or update of Vendor.
+      CALL METHOD vmd_ei_api=>maintain_bapi
+        EXPORTING
+          is_master_data           = is_vmds_extern
+          iv_test_run              = iv_test_run
+        IMPORTING
+          es_master_data_correct   = es_vmds_succ
+          es_master_data_defective = es_vmds_error
+          es_message_defective     = DATA(ls_err_msgs).
+
+      APPEND LINES OF is_vmds_error-vendors TO es_vmds_error-vendors.
+
+      set_success_display_msgs(
+         EXPORTING
+           it_vendors   = es_vmds_succ-vendors
+           iv_test_run  = iv_test_run
+       ).
+
+      set_err_display_msgs(
+        EXPORTING
+          is_vendors_extern = is_vmds_extern    " Ext. Interface: Vendor Total Data
+          is_vendor         = es_vmds_error    " Ext. Interface: Vendor Total Data
+          is_context        = is_context    " Database table for markets
+          iv_test_run       = iv_test_run
+          is_err_messages   = ls_err_msgs
+      ).
+
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->READ_DATA_FROM_SRC_FILE
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_IPATH                       TYPE        EPSDIRNAM
+* | [--->] IV_FILENAME                    TYPE        EPSFILNAM
+* | [<---] ET_DATA                        TYPE        DATA
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD read_data_from_src_file.
+
+    DATA: lt_filelist TYPE STANDARD TABLE OF epsfili,
+          ls_filelist TYPE epsfili,
+          lv_filename TYPE string,
+          lv_dot      TYPE char1 VALUE '.',
+          lv_line     TYPE char1250,
+          lv_string   TYPE string,
+          lv_msg      TYPE bsstring,
+          lv_cxroot   TYPE REF TO cx_root.
+
+* Get all files from input file
+    CALL FUNCTION 'EPS_GET_DIRECTORY_LISTING'
+      EXPORTING
+        dir_name               = iv_ipath
+      TABLES
+        dir_list               = lt_filelist
+      EXCEPTIONS
+        invalid_eps_subdir     = 1
+        sapgparam_failed       = 2
+        build_directory_failed = 3
+        no_authorization       = 4
+        read_directory_failed  = 5
+        too_many_read_errors   = 6
+        empty_directory_list   = 7
+        OTHERS                 = 8.
+    IF sy-subrc <> 0.
+* Implement suitable error handling here
+      IF lt_filelist IS INITIAL.
+*          MESSAGE e000(zzte) WITH 'Input File is not available in Appplication Server File Folder'(054).
+      ENDIF.
+
+    ENDIF.
+
+    IF sy-subrc = 0.
+
+      LOOP AT lt_filelist INTO ls_filelist.
+
+        CLEAR lv_filename .
+        IF ls_filelist-name EQ iv_filename.
+
+          CONCATENATE iv_ipath ls_filelist-name INTO lv_filename SEPARATED BY '/'.
+
+          TRY.
+              OPEN DATASET lv_filename FOR INPUT IN TEXT MODE ENCODING NON-UNICODE
+                                                              MESSAGE lv_msg.
+              IF sy-subrc <> 0.
+*                MESSAGE e000(zzte) WITH lv_msg.
+              ENDIF.
+
+              DO.
+                CLEAR lv_line.
+                READ DATASET lv_filename INTO lv_line.
+                IF sy-subrc <> 0.
+                  EXIT.
+                ENDIF.
+
+                CONCATENATE lv_string lv_line INTO lv_string.
+*                CONDENSE lv_string NO-GAPS.
+              ENDDO.
+
+              CLOSE DATASET lv_filename.
+
+              DELETE DATASET lv_filename.
+
+              /ui2/cl_json=>deserialize( EXPORTING json = lv_string pretty_name = /ui2/cl_json=>pretty_mode-camel_case CHANGING data = et_data ).
+
+              EXIT.
+*   Catch Exception for OPEN dataset statement
+            CATCH cx_root INTO lv_cxroot.
+              lv_msg = lv_cxroot->get_text( ).
+*              MESSAGE e000(zzte) WITH lv_msg.
+              EXIT.
+          ENDTRY.
+        ENDIF.
+      ENDLOOP.
+    ENDIF.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->RETURN_MSGS
+* +-------------------------------------------------------------------------------------------------+
+* | [<-->] CT_DISPLAY_MSGS                TYPE        ZAPT_CTE_INFOTAB_T(optional)
+* | [<-->] CT_LOG_MSGS                    TYPE        BAPIRET2_T(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD return_msgs.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Return log msgs                                      *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 02/18/2019                                           *
+** Description   : Append log msgs to the main log                      *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    APPEND LINES OF gt_log_msgs TO ct_log_msgs.
+    APPEND LINES OF gt_display_msgs TO ct_display_msgs.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AP_CTE_UTILITY->SET_ERR_DISPLAY_MSGS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IS_VENDORS_EXTERN              TYPE        VMDS_EI_MAIN
+* | [--->] IS_VENDOR                      TYPE        VMDS_EI_MAIN
+* | [--->] IS_CONTEXT                     TYPE        ZAPT_CTE_MARKET
+* | [--->] IV_TEST_RUN                    TYPE        ANY(optional)
+* | [--->] IS_ERR_MESSAGES                TYPE        CVIS_MESSAGE
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_err_display_msgs.
+
+    DATA: ls_display_msgs LIKE LINE OF gt_display_msgs,
+          ls_err_rec      TYPE zapt_cte_err_tab,
+          lv_index        TYPE i,
+          lt_err_tab      TYPE TABLE OF zapt_cte_err_tab.
+
+* Read error table
+    SELECT *
+    FROM zapt_cte_err_tab
+    INTO TABLE @lt_err_tab.
+
+    LOOP AT is_vendor-vendors INTO DATA(ls_vendor).
+
+      ls_err_rec-id = ls_vendor-central_data-central-data-stcd2.
+      ls_err_rec-source_id = is_context-source_id.
+      ls_err_rec-cntry = is_context-cntry.
+      ls_err_rec-object_id = is_context-object_id.
+      ls_err_rec-region = is_context-region.
+      ls_err_rec-err_date = sy-datum.
+
+      LOOP AT is_vendors_extern-vendors INTO DATA(ls_all_vendors).
+        IF ls_vendor-central_data-central-data-stcd2 = ls_all_vendors-central_data-central-data-stcd2.
+          lv_index = sy-tabix.
+          LOOP AT is_err_messages-messages INTO DATA(ls_messages).
+            IF ls_messages-row = lv_index and ls_messages-type = 'E'.
+              CONCATENATE ls_err_rec-error_msg ls_messages-message INTO ls_err_rec-error_msg SEPARATED BY ' '.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+      ENDLOOP.
+
+      READ TABLE ls_vendor-central_data-address-communication-smtp-smtp INTO  DATA(ls_smtp) INDEX 1.
+      IF sy-subrc = 0.
+        ls_err_rec-email_id = ls_smtp-contact-data-e_mail.
+      ENDIF.
+      APPEND ls_err_rec TO lt_err_tab.
+      CLEAR ls_err_rec.
+
+      ls_display_msgs-keyinfo = ls_vendor-header-object_instance-lifnr.
+      ls_display_msgs-id = ls_vendor-central_data-central-data-stcd2.
+      ls_display_msgs-type = text-r17.
+      READ TABLE ls_vendor-central_data-address-communication-smtp-smtp INTO DATA(ls_smtp_err) INDEX 1.
+      IF sy-subrc IS INITIAL.
+        ls_display_msgs-info = ls_smtp_err-contact-data-e_mail.
+      ENDIF.
+      IF ls_vendor-header-object_task = gc_insert AND iv_test_run IS INITIAL..
+        ls_display_msgs-message =  text-r04.
+      ELSEIF ls_vendor-header-object_task = gc_update AND iv_test_run IS INITIAL..
+        ls_display_msgs-message =  text-r06.
+      ELSEIF ls_vendor-header-object_task = gc_insert AND iv_test_run IS NOT INITIAL.
+        ls_display_msgs-message =  text-r22.
+      ELSEIF ls_vendor-header-object_task = gc_update AND iv_test_run IS NOT INITIAL.
+        ls_display_msgs-message =  text-r23.
+      ENDIF.
+      APPEND ls_display_msgs TO gt_display_msgs.
+
+    ENDLOOP.
+
+*  Commit work for maintain_bapi
+    IF iv_test_run IS INITIAL.
+*Errors should be written to DB, only if it is not a test run
+      MODIFY zapt_cte_err_tab FROM TABLE lt_err_tab.
+      COMMIT WORK.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->SET_ERR_LOG
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_ERR_MSGS                    TYPE        BAPIRET2_T(optional)
+* | [--->] IT_SOURCE_IDS                  TYPE        ANY(optional)
+* | [--->] IT_EMPIDS                      TYPE        ANY(optional)
+* | [--->] IT_OBJECTIDS                   TYPE        ANY(optional)
+* | [--->] IV_REGION                      TYPE        ZAPF_REGION(optional)
+* | [--->] IV_CNTRY                       TYPE        T005T-LAND1(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_err_log.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Set error log                                        *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 02/18/2019                                           *
+** Description   : Method to check error log                            *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+    DATA: lt_log_msgs  TYPE bapiret2_t,
+          ls_log_msgs  TYPE bapiret2,
+          lt_sources   TYPE rseloption,
+          lt_empids    TYPE rseloption,
+          lt_objectids TYPE rseloption,
+          lv_obj       TYPE balobj_d,
+          lv_subobj    TYPE balsubobj,
+          lt_db_errors TYPE TABLE OF zapt_cte_err_tab.
+
+    lt_sources = it_source_ids.
+    lt_empids = it_empids.
+    lt_objectids = it_objectids.
+    APPEND LINES OF it_err_msgs  TO lt_log_msgs.
+    APPEND LINES OF gt_log_msgs TO lt_log_msgs.
+
+    SELECT *
+      FROM zapt_cte_err_tab
+      INTO TABLE lt_db_errors
+      WHERE object_id IN lt_objectids
+        AND cntry = iv_cntry
+        AND region = iv_region
+        AND source_id IN lt_sources
+        AND id IN lt_empids.
+
+*Read messages stored in db error table and add to application log table
+    LOOP AT lt_db_errors INTO DATA(ls_db_errors).
+      CONCATENATE ls_db_errors-error_msg ' (' ls_db_errors-id ',' ls_db_errors-email_id ',' ls_db_errors-source_id ')' INTO ls_log_msgs-message.
+      ls_log_msgs-type = gc_error_msg_type.
+      APPEND ls_log_msgs TO lt_log_msgs.
+      CLEAR ls_log_msgs.
+    ENDLOOP.
+
+*If msgs are available, write them to the application log
+    IF lt_log_msgs IS NOT INITIAL.
+      SELECT *
+        FROM tvarvc
+        INTO TABLE @DATA(lt_tvarvc)
+        WHERE name = 'Z_CTE_APP_LOG_OBJECTNAME'
+        OR name = 'Z_CTE_APP_LOG_SUBOBJECTNAME'.
+
+      TRY.
+          lv_obj =  lt_tvarvc[ name = 'Z_CTE_APP_LOG_OBJECTNAME' ]-low.
+          lv_subobj =  lt_tvarvc[ name = 'Z_CTE_APP_LOG_SUBOBJECTNAME' ]-low.
+          write_to_app_log(
+            EXPORTING
+              fi_object    =   lv_obj  " Application Log: Object Name (Application Code)
+              fi_subobject =   lv_subobj  " Application Log: Subobject
+              ft_messages  =    lt_log_msgs " Return parameter table
+          ).
+        CATCH cx_sy_itab_line_not_found.
+      ENDTRY.
+
+      CLEAR gt_log_msgs.
+    ENDIF.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->SET_ERR_LOG_CN
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_ERR_MSGS                    TYPE        BAPIRET2_T
+* | [--->] IV_REGION                      TYPE        ZAPF_REGION
+* | [--->] IV_CNTRY                       TYPE        T005T-LAND1
+* | [--->] IV_SOURCE_ID                   TYPE        ANY
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  method SET_ERR_LOG_CN.
+    DATA: lt_log_msgs  TYPE bapiret2_t,
+          ls_log_msgs  TYPE bapiret2,
+          lt_sources   TYPE rseloption,
+          lt_db_errors TYPE TABLE OF zapt_cte_err_tab,
+          lv_obj       TYPE balobj_d,
+          lv_subobj    TYPE balsubobj.
+
+    APPEND LINES OF it_err_msgs  TO lt_log_msgs.
+    APPEND LINES OF GT_LOG_MSGS TO lt_log_msgs.
+
+    SELECT * FROM zapt_cte_err_tab INTO TABLE lt_db_errors WHERE source_id IN lt_sources
+                                                                    AND CNTRY = iv_cntry.   "GAK01+
+*Read messages stored in db error table and add to application log table
+    LOOP AT lt_db_errors INTO DATA(ls_db_errors).
+      CONCATENATE ls_db_errors-error_msg ' (' ls_db_errors-id ',' ls_db_errors-email_id ',' ls_db_errors-source_id ')' INTO ls_log_msgs-message.
+      ls_log_msgs-type = mv_error.
+      APPEND ls_log_msgs TO lt_log_msgs.
+      CLEAR ls_log_msgs.
+    ENDLOOP.
+
+    lv_obj = 'ZCTE'.
+    lv_subobj = 'ZCTE_FILE'.
+*If msgs are available, write them to the application log
+    IF lt_log_msgs IS NOT INITIAL.
+      SELECT *
+        FROM tvarvc
+        INTO TABLE @DATA(lt_tvarvc)
+        WHERE name = 'Z_CTE_I01217_APPLOG_SOURCE'
+        OR name = 'Z_CTE_APP_LOG_SUBOBJECTNAME'.
+
+      TRY.
+          lv_obj =  lt_tvarvc[ name = 'Z_CTE_I01217_APPLOG_SOURCE' ]-low.
+          lv_subobj =  lt_tvarvc[ name = 'Z_CTE_APP_LOG_SUBOBJECTNAME' ]-low.
+          write_to_app_log(
+            EXPORTING
+              fi_object    =   lv_obj  " Application Log: Source ID (Application Code)
+              fi_subobject =   lv_subobj  " Application Log: Subobject
+              ft_messages  =    lt_log_msgs " Return parameter table
+          ).
+        CATCH cx_sy_itab_line_not_found.
+      ENDTRY.
+
+      CLEAR gt_log_msgs.
+    ENDIF.
+  endmethod.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AP_CTE_UTILITY->SET_PARAMETERS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IV_CNTRY                       TYPE        LAND1
+* | [<-->] CT_VENDORS                     TYPE        VMDS_EI_EXTERN_T
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_parameters.
+*************************************************************************
+** Object ID     : I01217                                               *
+** Title         : Set parameters for vendor master                     *
+** Author        : Karthik Bhat/Manan Singla                            *
+** Country       : Global                                               *
+** Creation Date : 01/28/2019                                           *
+** Description   : Method to set parameters for vendor master           *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**                                                                      *
+**----------------------------------------------------------------------*
+
+    DATA: lt_vendors         TYPE vmds_ei_extern_t,
+          ls_vendors         LIKE LINE OF lt_vendors,
+          lt_exising_vendors TYPE TABLE OF lfa1.
+
+*Select all the existing vendors
+    SELECT lifnr stcd2
+      FROM lfa1
+      INTO CORRESPONDING FIELDS OF TABLE lt_exising_vendors
+      WHERE land1 = iv_cntry.
+
+    LOOP AT ct_vendors ASSIGNING FIELD-SYMBOL(<fs_vendor>).
+      IF <fs_vendor> IS ASSIGNED.
+        READ TABLE lt_exising_vendors INTO DATA(ls_existing_vendors)
+        WITH KEY stcd2 = <fs_vendor>-central_data-central-data-stcd2.
+
+* Check if the vendor is already created for this employee.
+* If yes, its task is set to 'update'
+        IF sy-subrc = 0.
+          <fs_vendor>-header-object_instance-lifnr = ls_existing_vendors-lifnr.
+          <fs_vendor>-header-object_task = gc_update.
+*Change of Ktokk field is not permitted, so we set its change flag to initial
+          <fs_vendor>-central_data-central-datax-ktokk = ' '.
+          <fs_vendor>-central_data-address-task = gc_update.
+          LOOP AT <fs_vendor>-company_data-company ASSIGNING FIELD-SYMBOL(<fs_company_u>).
+            IF <fs_company_u> IS ASSIGNED.
+              <fs_company_u>-task = gc_update.
+            ENDIF.
+          ENDLOOP.
+
+        ELSE.
+*If the vendor is not present and the task is set to 'update',
+*           control should continue to the next iteration
+          IF <fs_vendor>-header-object_task = gc_update.
+            add_error_msg(
+              EXPORTING
+                iv_msgtype   =   'E'  " Message type: S Success, E Error, W Warning, I Info, A Abort
+                iv_msgclass  =   gc_msg_class_cte  " Message Class
+                iv_msgnumber =   '017'  " Message Number
+                iv_msg_v1    =   <fs_vendor>-central_data-central-data-stcd2
+            ).
+*Since the bank details can't be updated for a non-existant vendor
+*we delete the bank details for that record or it will dump
+            DELETE ct_vendors.
+            CONTINUE.
+          ENDIF.
+*If the vendor doesn't exist for this emp id, the task should be set to 'insert'.
+          <fs_vendor>-header-object_task = gc_insert.
+          <fs_vendor>-central_data-address-task = gc_insert.
+
+          LOOP AT <fs_vendor>-company_data-company ASSIGNING FIELD-SYMBOL(<fs_company_i>).
+            IF <fs_company_i> IS ASSIGNED.
+              <fs_company_i>-task = gc_insert.
+            ENDIF.
+          ENDLOOP.
+        ENDIF.
+
+*If the record contains bank details, add it to the vendor master structure
+        IF <fs_vendor>-central_data-bankdetail-bankdetails IS NOT INITIAL.
+          handle_bank_data(
+            EXPORTING
+              is_vendor_master =  ls_existing_vendors
+            CHANGING
+              ct_bank_records  =  <fs_vendor>-central_data-bankdetail-bankdetails
+          ).
+        ENDIF.
+
+      ENDIF.
+    ENDLOOP.
+
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Private Method ZCL_AP_CTE_UTILITY->SET_SUCCESS_DISPLAY_MSGS
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] IT_VENDORS                     TYPE        VMDS_EI_EXTERN_T
+* | [--->] IV_TEST_RUN                    TYPE        ANY(optional)
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD set_success_display_msgs.
+    DATA ls_display_msgs LIKE LINE OF gt_display_msgs.
+
+    LOOP AT it_vendors INTO DATA(ls_vendor).
+
+      ls_display_msgs-keyinfo = ls_vendor-header-object_instance-lifnr.
+      ls_display_msgs-id = ls_vendor-central_data-central-data-stcd2.
+      ls_display_msgs-type = text-r16.
+      READ TABLE ls_vendor-central_data-address-communication-smtp-smtp INTO DATA(ls_smtp_err) INDEX 1.
+      IF sy-subrc IS INITIAL.
+        ls_display_msgs-info = ls_smtp_err-contact-data-e_mail.
+      ENDIF.
+      IF ls_vendor-header-object_task = gc_insert  AND iv_test_run IS INITIAL.
+        ls_display_msgs-message =  text-r03.
+      ELSEIF ls_vendor-header-object_task = gc_update  AND iv_test_run IS INITIAL.
+        ls_display_msgs-message =  text-r05.
+      ELSEIF ls_vendor-header-object_task = gc_insert  AND iv_test_run IS NOT INITIAL.
+        ls_display_msgs-message =  text-r21.
+      ELSEIF ls_vendor-header-object_task = gc_update  AND iv_test_run IS NOT INITIAL.
+        ls_display_msgs-message =  text-r20.
+      ENDIF.
+      APPEND ls_display_msgs TO gt_display_msgs.
+      CLEAR ls_display_msgs.
+
+    ENDLOOP.
+  ENDMETHOD.
+
+
+* <SIGNATURE>---------------------------------------------------------------------------------------+
+* | Instance Public Method ZCL_AP_CTE_UTILITY->WRITE_TO_APP_LOG
+* +-------------------------------------------------------------------------------------------------+
+* | [--->] FI_OBJECT                      TYPE        BALOBJ_D
+* | [--->] FI_SUBOBJECT                   TYPE        BALSUBOBJ
+* | [--->] FT_MESSAGES                    TYPE        BAPIRET2_T
+* +--------------------------------------------------------------------------------------</SIGNATURE>
+  METHOD write_to_app_log.
+    DATA:  ls_log       TYPE bal_s_log,
+           lv_loghandle TYPE balloghndl,
+           lt_loghandle TYPE bal_t_logh.
+    DATA: ls_log_msg    TYPE bal_s_msg.
+* open log
+    ls_log-object    = fi_object.
+    ls_log-subobject = fi_subobject.
+    ls_log-aluser    = sy-uname.
+    ls_log-alprog    = sy-repid.
+
+    CALL FUNCTION 'BAL_LOG_CREATE'                            "#EC *
+      EXPORTING
+        i_s_log      = ls_log
+      IMPORTING
+        e_log_handle = lv_loghandle
+      EXCEPTIONS
+        OTHERS       = 1.
+
+    LOOP AT ft_messages ASSIGNING FIELD-SYMBOL(<ls_message>).
+
+      IF <ls_message>-message IS ASSIGNED AND <ls_message>-message IS NOT INITIAL.
+        DATA(lv_message) = <ls_message>-message.
+        IF NOT <ls_message>-message_v1 IS INITIAL.
+          REPLACE FIRST OCCURRENCE OF '&' IN lv_message WITH <ls_message>-message_v1.
+        ENDIF.
+        IF NOT <ls_message>-message_v2 IS INITIAL.
+          REPLACE FIRST OCCURRENCE OF '&' IN lv_message WITH <ls_message>-message_v2.
+        ENDIF.
+        IF NOT <ls_message>-message_v3 IS INITIAL.
+          REPLACE FIRST OCCURRENCE OF '&' IN lv_message WITH <ls_message>-message_v3.
+        ENDIF.
+        IF NOT <ls_message>-message_v4 IS INITIAL.
+          REPLACE FIRST OCCURRENCE OF '&' IN lv_message WITH <ls_message>-message_v4.
+        ENDIF.
+
+        CALL FUNCTION 'BAL_LOG_MSG_ADD_FREE_TEXT'               "#EC *
+          EXPORTING
+            i_log_handle     = lv_loghandle
+            i_msgty          = <ls_message>-type
+            i_text           = lv_message
+          EXCEPTIONS
+            log_not_found    = 1
+            msg_inconsistent = 2
+            log_is_full      = 3
+            OTHERS           = 4.
+      ELSE.
+
+
+*   fill BAL message structure
+        ls_log_msg-msgid = <ls_message>-id.
+        ls_log_msg-msgty = <ls_message>-type.
+        ls_log_msg-msgno = <ls_message>-number.
+        ls_log_msg-msgv1 = <ls_message>-message_v1.
+        ls_log_msg-msgv2 = <ls_message>-message_v2.
+        ls_log_msg-msgv3 = <ls_message>-message_v3.
+        ls_log_msg-msgv4 = <ls_message>-message_v4.
+
+        CASE ls_log_msg-msgty.
+          WHEN 'A' OR 'E' OR 'X'.
+            ls_log_msg-probclass = '1'.
+          WHEN 'W'.
+            ls_log_msg-probclass = '2'.
+          WHEN 'I' OR 'S'.
+            ls_log_msg-probclass = '4'.
+        ENDCASE.
+
+*   write message to BAL
+        CALL FUNCTION 'BAL_LOG_MSG_ADD'
+          EXPORTING
+            i_log_handle = lv_loghandle
+            i_s_msg      = ls_log_msg.
+
+        CLEAR ls_log_msg.
+      ENDIF.
+    ENDLOOP.
+
+    INSERT lv_loghandle INTO TABLE lt_loghandle.
+
+    CALL FUNCTION 'BAL_DB_SAVE'                               "#EC *
+      EXPORTING
+        i_save_all       = ' '
+        i_t_log_handle   = lt_loghandle
+      EXCEPTIONS
+        log_not_found    = 1
+        save_not_allowed = 2
+        numbering_error  = 3
+        OTHERS           = 4.
+
+  ENDMETHOD.
+ENDCLASS.
