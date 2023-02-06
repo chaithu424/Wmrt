@@ -1,0 +1,59 @@
+************************************************************************
+** Object ID     : I01289                                               *
+** Title         : Data staging for Concur                              *
+** Author        : Hari Chaitanya                                       *
+** Country       : Global                                               *
+** Creation Date : 08/08/2022                                           *
+** Description   : Program to update Data staging tables for Concur     *
+**                                                                      *
+*************************************************************************
+** Modifications                                                        *
+**----------------------------------------------------------------------*
+
+REPORT zfapui01289_hr_concur_export.
+*-----------------------------------------------------------------------*
+* I N C L U D E S
+*-----------------------------------------------------------------------*
+*-- Data Declarations
+INCLUDE zfapii01289_hr_concur_exp_top.
+
+*-- Selection screen
+INCLUDE zfapii01289_hr_concur_exp_sel.
+
+INITIALIZATION.
+
+  go_hrdata = zfapcl_hr_master_data_concur=>get_instance( im_report = sy-repid ).
+
+*----------------------------------------------------------------------*
+* S T A R T   O F   S E L E C T I O N
+*----------------------------------------------------------------------*
+START-OF-SELECTION.
+
+*-- Upload Input File
+  go_hrdata->get_input_file_data(
+    EXPORTING
+      iv_ipath     = p_logfl         " Logical file name
+      iv_bpath     = p_logbk         " Logical file name
+    IMPORTING
+      et_hrdata    = gt_hrdata       " Table type for HRDW data
+      et_errors_db = gt_errors_db    " HRDW error records
+  ).
+
+
+  CHECK gt_hrdata IS NOT INITIAL.
+*-- process the data
+  go_hrdata->process_data(
+    EXPORTING
+      iv_prlpr        = p_prlpr         " Single-Character Indicator
+      it_hrdata       = gt_hrdata       " Table type for HRDW data
+      iv_stage_flg    = abap_true       " Single-Character Indicator
+      iv_server       = p_server        " Logon/Server Group Name
+      iv_thrds        = p_thrds ).
+
+
+END-OF-SELECTION.
+
+*--perform DB updates
+  go_hrdata->update_db( iv_bpath = p_logbk ).
+
+  go_hrdata->display_output( ).
